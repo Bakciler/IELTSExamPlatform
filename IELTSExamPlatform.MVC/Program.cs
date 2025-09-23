@@ -1,10 +1,15 @@
+using IELTSExamPlatform.DAL;
+using IELTSExamPlatform.DAL.Seed;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+builder.Services.AddPostgreSQLServices(builder.Configuration);
 
 var app = builder.Build();
 
+await app.UseUserSeedAsync();
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {

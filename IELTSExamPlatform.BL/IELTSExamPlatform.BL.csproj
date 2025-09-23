@@ -12,4 +12,8 @@
     <Folder Include="Services\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\IELTSExamPlatform.DAL\IELTSExamPlatform.DAL.csproj" />
+  </ItemGroup>
+
 </Project>
