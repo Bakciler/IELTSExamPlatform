@@ -1,3 +1,4 @@
+using IELTSExamPlatform.BL;
 using IELTSExamPlatform.DAL;
 using IELTSExamPlatform.DAL.Seed;
 
@@ -6,6 +7,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 builder.Services.AddPostgreSQLServices(builder.Configuration);
+builder.Services.AddBLServices();
 
 var app = builder.Build();
 
