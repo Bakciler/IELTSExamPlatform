@@ -6,4 +6,5 @@ public class Blank : BaseEntity
     public Guid SentenceId { get; set; }
     public Sentence Sentence { get; set; }
     public string CorrectAnswer { get; set; }
+    public int Order { get; set; }
 }

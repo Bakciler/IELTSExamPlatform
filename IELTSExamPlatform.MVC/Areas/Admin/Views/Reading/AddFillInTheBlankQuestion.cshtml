@@ -1,0 +1,80 @@
+﻿@using IELTSExamPlatform.BL.DTOs.ReadingQuestions.FillBlanks
+@model CreateFillInTheBlankDto
+
+@{
+    ViewData["Title"] = "Create Fill In The Blank Question";
+}
+
+<div class="container mt-4">
+    <h2 class="mb-4">Create Fill In The Blank</h2>
+
+    <form asp-action="AddFillInTheBlankQuestion" method="post">
+        <div class="mb-3">
+            <label class="form-label">Reading Passage</label>
+            <input asp-for="ReadingPassageId" class="form-control" placeholder="Enter ReadingPassageId (Guid)" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Question Text</label>
+            <textarea asp-for="QuestionText" class="form-control" rows="2"></textarea>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Order</label>
+            <input asp-for="Order" class="form-control" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Question Range</label>
+            <input asp-for="QuestionRange" class="form-control" />
+        </div>
+
+        <hr />
+        <h4>Sentences</h4>
+        <div id="sentences-container"></div>
+        <button type="button" class="btn btn-outline-secondary mb-3" onclick="addSentence()">+ Add Sentence</button>
+
+        <br />
+        <button type="submit" class="btn btn-primary">Save</button>
+    </form>
+</div>
+
+@section Scripts {
+    <script>
+        let sentenceIndex = 0;
+
+        function addSentence() {
+            const container = document.getElementById("sentences-container");
+            const sentenceDiv = document.createElement("div");
+            sentenceDiv.classList.add("card", "mb-3", "p-3");
+            sentenceDiv.innerHTML = `
+                <h5>Sentence ${sentenceIndex + 1}</h5>
+                <div class="mb-3">
+                    <label class="form-label">Content</label>
+                    <textarea name="Sentences[${sentenceIndex}].Content" class="form-control" rows="2"></textarea>
+                </div>
+                <div id="blanks-${sentenceIndex}"></div>
+                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="addBlank(${sentenceIndex})">+ Add Blank</button>
+            `;
+            container.appendChild(sentenceDiv);
+            sentenceIndex++;
+        }
+
+        function addBlank(sentenceIdx) {
+            const container = document.getElementById(`blanks-${sentenceIdx}`);
+            const blankCount = container.children.length;
+
+            const blankDiv = document.createElement("div");
+            blankDiv.classList.add("border", "p-2", "mb-2");
+            blankDiv.innerHTML = `
+                <h6>Blank ${blankCount + 1}</h6>
+                <div class="mb-2">
+                    <label class="form-label">Correct Answer</label>
+                    <input name="Sentences[${sentenceIdx}].Blanks[${blankCount}].CorrectAnswer" class="form-control" required />
+                </div>
+            `;
+            container.appendChild(blankDiv);
+        }
+    </script>
+}
+

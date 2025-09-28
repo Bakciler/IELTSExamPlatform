@@ -6,6 +6,7 @@ namespace IELTSExamPlatform.CORE.Entities
     {
         public Guid FillInTheBlankId { get; set; }   
         public FillInTheBlank FillInTheBlank { get; set; }
+        public string Text { get; set; }
         public ICollection<Blank> Blanks { get; set; } = new List<Blank>();
     }
 }

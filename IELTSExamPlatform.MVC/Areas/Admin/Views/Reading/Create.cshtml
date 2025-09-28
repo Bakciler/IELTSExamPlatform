@@ -1,0 +1,67 @@
+﻿@using IELTSExamPlatform.BL.DTOs.Reading
+@model CreateReadingDto
+@{
+    ViewData["Title"] = "Create";
+}
+
+<div class="container mt-4">
+    <h2 class="mb-4">Create Reading</h2>
+
+    <form asp-action="Create" method="post">
+        <div id="passages-container">
+            <!-- Passage inputs buraya əlavə olunacaq -->
+        </div>
+
+        <button type="button" class="btn btn-secondary mb-3" onclick="addPassage()">+ Add Passage</button>
+        <br />
+        <button type="submit" class="btn btn-primary">Save Reading</button>
+    </form>
+</div>
+
+@section scripts {
+    <script>
+        let passageIndex = 0;
+
+        function addPassage() {
+            const container = document.getElementById("passages-container");
+            const passageDiv = document.createElement("div");
+            passageDiv.classList.add("card", "mb-3", "p-3");
+            passageDiv.innerHTML = `
+                <h5>Passage ${passageIndex + 1}</h5>
+                <div class="mb-3">
+                    <label class="form-label">Title</label>
+                    <input name="Passages[${passageIndex}].Title" class="form-control" required />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Description</label>
+                    <textarea name="Passages[${passageIndex}].Description" class="form-control" rows="2"></textarea>
+                </div>
+                <div id="paragraphs-${passageIndex}">
+                </div>
+                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="addParagraph(${passageIndex})">+ Add Paragraph</button>
+            `;
+            container.appendChild(passageDiv);
+            passageIndex++;
+        }
+
+        function addParagraph(passageIdx) {
+            const container = document.getElementById(`paragraphs-${passageIdx}`);
+            const paragraphCount = container.children.length;
+
+            const paragraphDiv = document.createElement("div");
+            paragraphDiv.classList.add("border", "p-2", "mb-2");
+            paragraphDiv.innerHTML = `
+                <h6>Paragraph ${paragraphCount + 1}</h6>
+                <div class="mb-2">
+                    <label class="form-label">Key</label>
+                    <input name="Passages[${passageIdx}].Paragraphs[${paragraphCount}].Key" class="form-control" maxlength="1" required />
+                </div>
+                <div class="mb-2">
+                    <label class="form-label">Content</label>
+                    <textarea name="Passages[${passageIdx}].Paragraphs[${paragraphCount}].Content" class="form-control" rows="2" required></textarea>
+                </div>
+            `;
+            container.appendChild(paragraphDiv);
+        }
+    </script>
+    }
