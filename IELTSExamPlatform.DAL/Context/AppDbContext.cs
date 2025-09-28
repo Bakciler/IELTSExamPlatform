@@ -8,7 +8,7 @@ namespace IELTSExamPlatform.DAL.Context
     {
         public DbSet<Reading> Readings { get; set; }
         public DbSet<ReadingPassage> ReadingPassages { get; set; }
-        public DbSet<ReadingParagrahs> ReadingParagrahs { get; set; }
+        public DbSet<ReadingParagraphs> ReadingParagraphs { get; set; }
         public DbSet<Heading> Headings { get; set; }
         public DbSet<ChoiceQuestion> ChoicesQuestions { get; set; }
         public DbSet<QuestionOption> QuestionOptions { get; set; }

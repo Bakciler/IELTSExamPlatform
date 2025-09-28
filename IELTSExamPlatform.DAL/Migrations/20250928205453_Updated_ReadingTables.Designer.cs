@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace IELTSExamPlatform.DAL.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250928201103_Created_ReadingTables")]
-    partial class Created_ReadingTables
+    [Migration("20250928205453_Updated_ReadingTables")]
+    partial class Updated_ReadingTables
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -99,32 +99,25 @@ namespace IELTSExamPlatform.DAL.Migrations
 
             modelBuilder.Entity("IELTSExamPlatform.CORE.Entities.Blank", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                        .HasColumnType("uuid");
 
                     b.Property<string>("CorrectAnswer")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("Order")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("QuestionRange")
-                        .HasColumnType("text");
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
 
-                    b.Property<string>("QuestionText")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<Guid>("SentenceId")
+                        .HasColumnType("uuid");
 
-                    b.Property<int>("ReadingPassageId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("SentenceId")
-                        .HasColumnType("integer");
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
@@ -135,11 +128,9 @@ namespace IELTSExamPlatform.DAL.Migrations
 
             modelBuilder.Entity("IELTSExamPlatform.CORE.Entities.BooleanQuestion", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Content")
                         .IsRequired()
@@ -148,9 +139,8 @@ namespace IELTSExamPlatform.DAL.Migrations
                     b.Property<int>("CorrectAnswer")
                         .HasColumnType("integer");
 
-                    b.Property<string>("Order")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<int>("Order")
+                        .HasColumnType("integer");
 
                     b.Property<string>("QuestionRange")
                         .HasColumnType("text");
@@ -159,25 +149,24 @@ namespace IELTSExamPlatform.DAL.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int>("ReadingPassageId")
-                        .HasColumnType("integer");
+                    b.Property<Guid>("ReadingPassageId")
+                        .HasColumnType("uuid");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ReadingPassageId");
 
                     b.ToTable("BooleanQuestions");
                 });
 
             modelBuilder.Entity("IELTSExamPlatform.CORE.Entities.ChoiceQuestion", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("Order")
                         .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Order")
-                        .IsRequired()
-                        .HasColumnType("text");
 
                     b.Property<string>("QuestionRange")
                         .HasColumnType("text");
@@ -186,25 +175,24 @@ namespace IELTSExamPlatform.DAL.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int>("ReadingPassageId")
-                        .HasColumnType("integer");
+                    b.Property<Guid>("ReadingPassageId")
+                        .HasColumnType("uuid");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ReadingPassageId");
 
                     b.ToTable("ChoicesQuestions");
                 });
 
             modelBuilder.Entity("IELTSExamPlatform.CORE.Entities.FillInTheBlank", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("Order")
                         .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Order")
-                        .IsRequired()
-                        .HasColumnType("text");
 
                     b.Property<string>("QuestionRange")
                         .HasColumnType("text");
@@ -213,18 +201,21 @@ namespace IELTSExamPlatform.DAL.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int>("ReadingPassageId")
-                        .HasColumnType("integer");
+                    b.Property<Guid>("ReadingPassageId")
+                        .HasColumnType("uuid");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ReadingPassageId");
 
                     b.ToTable("FillInTheBlanks");
                 });
 
             modelBuilder.Entity("IELTSExamPlatform.CORE.Entities.Heading", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasColumnType("text");
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Content")
                         .IsRequired()
@@ -236,9 +227,8 @@ namespace IELTSExamPlatform.DAL.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
-                    b.Property<string>("ReadingPassageId")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<Guid>("ReadingPassageId")
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Symbol")
                         .IsRequired()
@@ -256,22 +246,15 @@ namespace IELTSExamPlatform.DAL.Migrations
 
             modelBuilder.Entity("IELTSExamPlatform.CORE.Entities.MatchHeadingsQuestion", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("HeadingId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("Order")
                         .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("HeadingId")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("HeadingId1")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Order")
-                        .IsRequired()
-                        .HasColumnType("text");
 
                     b.Property<string>("QuestionRange")
                         .HasColumnType("text");
@@ -280,8 +263,8 @@ namespace IELTSExamPlatform.DAL.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int>("ReadingPassageId")
-                        .HasColumnType("integer");
+                    b.Property<Guid>("ReadingPassageId")
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Text")
                         .IsRequired()
@@ -289,21 +272,21 @@ namespace IELTSExamPlatform.DAL.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("HeadingId1");
+                    b.HasIndex("HeadingId");
+
+                    b.HasIndex("ReadingPassageId");
 
                     b.ToTable("MatchHeadingsQuestions");
                 });
 
             modelBuilder.Entity("IELTSExamPlatform.CORE.Entities.QuestionOption", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
+                        .HasColumnType("uuid");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("ChoiceQuestionId")
-                        .HasColumnType("integer");
+                    b.Property<Guid>("ChoiceQuestionId")
+                        .HasColumnType("uuid");
 
                     b.Property<char>("Code")
                         .HasColumnType("character(1)");
@@ -312,22 +295,17 @@ namespace IELTSExamPlatform.DAL.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<bool>("IsCorrect")
                         .HasColumnType("boolean");
 
-                    b.Property<string>("Order")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
 
-                    b.Property<string>("QuestionRange")
-                        .HasColumnType("text");
-
-                    b.Property<string>("QuestionText")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<int>("ReadingPassageId")
-                        .HasColumnType("integer");
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
@@ -338,8 +316,9 @@ namespace IELTSExamPlatform.DAL.Migrations
 
             modelBuilder.Entity("IELTSExamPlatform.CORE.Entities.Reading", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasColumnType("text");
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("timestamp with time zone");
@@ -361,8 +340,9 @@ namespace IELTSExamPlatform.DAL.Migrations
 
             modelBuilder.Entity("IELTSExamPlatform.CORE.Entities.ReadingParagrahs", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasColumnType("text");
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Content")
                         .IsRequired()
@@ -377,9 +357,8 @@ namespace IELTSExamPlatform.DAL.Migrations
                     b.Property<char>("Key")
                         .HasColumnType("character(1)");
 
-                    b.Property<string>("ReadingPassageId")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<Guid>("ReadingPassageId")
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime?>("UpdatedDate")
                         .HasColumnType("timestamp with time zone");
@@ -393,8 +372,9 @@ namespace IELTSExamPlatform.DAL.Migrations
 
             modelBuilder.Entity("IELTSExamPlatform.CORE.Entities.ReadingPassage", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasColumnType("text");
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("timestamp with time zone");
@@ -406,9 +386,8 @@ namespace IELTSExamPlatform.DAL.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
-                    b.Property<string>("ReadingId")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<Guid>("ReadingId")
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -426,28 +405,21 @@ namespace IELTSExamPlatform.DAL.Migrations
 
             modelBuilder.Entity("IELTSExamPlatform.CORE.Entities.Sentence", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
+                        .HasColumnType("uuid");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("timestamp with time zone");
 
-                    b.Property<int>("FillInTheBlankId")
-                        .HasColumnType("integer");
+                    b.Property<Guid>("FillInTheBlankId")
+                        .HasColumnType("uuid");
 
-                    b.Property<string>("Order")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
 
-                    b.Property<string>("QuestionRange")
-                        .HasColumnType("text");
-
-                    b.Property<string>("QuestionText")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<int>("ReadingPassageId")
-                        .HasColumnType("integer");
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
@@ -599,6 +571,33 @@ namespace IELTSExamPlatform.DAL.Migrations
                     b.Navigation("Sentence");
                 });
 
+            modelBuilder.Entity("IELTSExamPlatform.CORE.Entities.BooleanQuestion", b =>
+                {
+                    b.HasOne("IELTSExamPlatform.CORE.Entities.ReadingPassage", null)
+                        .WithMany("BooleanQuestions")
+                        .HasForeignKey("ReadingPassageId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("IELTSExamPlatform.CORE.Entities.ChoiceQuestion", b =>
+                {
+                    b.HasOne("IELTSExamPlatform.CORE.Entities.ReadingPassage", null)
+                        .WithMany("ChoiceQuestions")
+                        .HasForeignKey("ReadingPassageId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("IELTSExamPlatform.CORE.Entities.FillInTheBlank", b =>
+                {
+                    b.HasOne("IELTSExamPlatform.CORE.Entities.ReadingPassage", null)
+                        .WithMany("FillInTheBlanks")
+                        .HasForeignKey("ReadingPassageId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("IELTSExamPlatform.CORE.Entities.Heading", b =>
                 {
                     b.HasOne("IELTSExamPlatform.CORE.Entities.ReadingPassage", "ReadingPassage")
@@ -614,7 +613,13 @@ namespace IELTSExamPlatform.DAL.Migrations
                 {
                     b.HasOne("IELTSExamPlatform.CORE.Entities.Heading", "Heading")
                         .WithMany()
-                        .HasForeignKey("HeadingId1")
+                        .HasForeignKey("HeadingId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("IELTSExamPlatform.CORE.Entities.ReadingPassage", null)
+                        .WithMany("MatchHeadingsQuestions")
+                        .HasForeignKey("ReadingPassageId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -728,7 +733,15 @@ namespace IELTSExamPlatform.DAL.Migrations
 
             modelBuilder.Entity("IELTSExamPlatform.CORE.Entities.ReadingPassage", b =>
                 {
+                    b.Navigation("BooleanQuestions");
+
+                    b.Navigation("ChoiceQuestions");
+
+                    b.Navigation("FillInTheBlanks");
+
                     b.Navigation("Headings");
+
+                    b.Navigation("MatchHeadingsQuestions");
 
                     b.Navigation("ReadingParagrahs");
                 });
