@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace IELTSExamPlatform.DAL.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250928205453_Updated_ReadingTables")]
-    partial class Updated_ReadingTables
+    [Migration("20250929001653_InitialMigration")]
+    partial class InitialMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -112,6 +112,9 @@ namespace IELTSExamPlatform.DAL.Migrations
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
+
+                    b.Property<int>("Order")
+                        .HasColumnType("integer");
 
                     b.Property<Guid>("SentenceId")
                         .HasColumnType("uuid");
@@ -326,10 +329,6 @@ namespace IELTSExamPlatform.DAL.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
-                    b.Property<string>("Passage")
-                        .IsRequired()
-                        .HasColumnType("text");
-
                     b.Property<DateTime?>("UpdatedDate")
                         .HasColumnType("timestamp with time zone");
 
@@ -338,7 +337,7 @@ namespace IELTSExamPlatform.DAL.Migrations
                     b.ToTable("Readings");
                 });
 
-            modelBuilder.Entity("IELTSExamPlatform.CORE.Entities.ReadingParagrahs", b =>
+            modelBuilder.Entity("IELTSExamPlatform.CORE.Entities.ReadingParagraphs", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -367,7 +366,7 @@ namespace IELTSExamPlatform.DAL.Migrations
 
                     b.HasIndex("ReadingPassageId");
 
-                    b.ToTable("ReadingParagrahs");
+                    b.ToTable("ReadingParagraphs");
                 });
 
             modelBuilder.Entity("IELTSExamPlatform.CORE.Entities.ReadingPassage", b =>
@@ -417,6 +416,10 @@ namespace IELTSExamPlatform.DAL.Migrations
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
+
+                    b.Property<string>("Text")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<DateTime?>("UpdatedDate")
                         .HasColumnType("timestamp with time zone");
@@ -637,7 +640,7 @@ namespace IELTSExamPlatform.DAL.Migrations
                     b.Navigation("ChoiceQuestion");
                 });
 
-            modelBuilder.Entity("IELTSExamPlatform.CORE.Entities.ReadingParagrahs", b =>
+            modelBuilder.Entity("IELTSExamPlatform.CORE.Entities.ReadingParagraphs", b =>
                 {
                     b.HasOne("IELTSExamPlatform.CORE.Entities.ReadingPassage", "ReadingPassage")
                         .WithMany("ReadingParagrahs")
@@ -651,7 +654,7 @@ namespace IELTSExamPlatform.DAL.Migrations
             modelBuilder.Entity("IELTSExamPlatform.CORE.Entities.ReadingPassage", b =>
                 {
                     b.HasOne("IELTSExamPlatform.CORE.Entities.Reading", "Reading")
-                        .WithMany()
+                        .WithMany("ReadingPassages")
                         .HasForeignKey("ReadingId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -729,6 +732,11 @@ namespace IELTSExamPlatform.DAL.Migrations
             modelBuilder.Entity("IELTSExamPlatform.CORE.Entities.FillInTheBlank", b =>
                 {
                     b.Navigation("Sentences");
+                });
+
+            modelBuilder.Entity("IELTSExamPlatform.CORE.Entities.Reading", b =>
+                {
+                    b.Navigation("ReadingPassages");
                 });
 
             modelBuilder.Entity("IELTSExamPlatform.CORE.Entities.ReadingPassage", b =>
