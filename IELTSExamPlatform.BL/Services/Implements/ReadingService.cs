@@ -1,5 +1,6 @@
 ﻿using IELTSExamPlatform.BL.DTOs.Reading;
 using IELTSExamPlatform.BL.DTOs.ReadingQuestions.FillBlanks;
+using IELTSExamPlatform.BL.DTOs.ReadingQuestions.Get;
 using IELTSExamPlatform.BL.Services.Abstractions;
 using IELTSExamPlatform.CORE.Entities;
 using IELTSExamPlatform.DAL.Context;
@@ -29,7 +30,6 @@ public class ReadingService : IReadingService
                 Text = s.Content,
                 Blanks = s.Blanks.Select(b => new Blank
                 {
-                    Order = currentOrder++,
                     CorrectAnswer = b.CorrectAnswer,
                 }).ToList(),
             }).ToList()
@@ -54,9 +54,41 @@ public class ReadingService : IReadingService
                 }).ToList()
             }).ToList()
         };
-        
+
         await _appDbContext.Readings.AddAsync(reading);
-        
+
         await _appDbContext.SaveChangesAsync();
     }
+
+    public async Task<List<FillInTheBlankDto>> GetQuestionsAsync(Guid passageId)
+    {
+        var questions = await _appDbContext.ReadingPassages
+            .Where(r => r.Id == passageId)
+            .SelectMany(r => r.FillInTheBlanks) // passage içindeki soruları direkt al
+            .Select(q => new FillInTheBlankDto
+            {
+                Id = q.Id,
+                Order = q.Order,
+                QuestionText = q.QuestionText,
+                Sentences = q.Sentences.Select(s => new SentenceDto
+                {
+                    Id = s.Id,
+                    Text = s.Text,
+                    Blanks = s.Blanks.Select(b => new BlankDto
+                    {
+                        Id = b.Id,
+                        CorrectAnswer = b.CorrectAnswer
+                    }).ToList()
+                }).ToList()
+            })
+            .ToListAsync();
+
+        return questions;
+    }
+
+
+    
+
+
+
 }

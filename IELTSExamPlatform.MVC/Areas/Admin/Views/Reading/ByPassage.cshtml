@@ -1,0 +1,46 @@
+﻿@using IELTSExamPlatform.BL.DTOs.ReadingQuestions.Get
+@model List<FillInTheBlankDto>
+@{
+    ViewData["Title"] = "Passage Soruları";
+}
+
+<div class="container mt-4">
+    <h2 class="mb-4">@ViewData["Title"]</h2>
+
+    @foreach (var question in Model)
+    {
+        <div class="card mb-3 shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">Soru @question.Order</h5>
+                <p class="card-text">@question.QuestionText</p>
+
+                @foreach (var sentence in question.Sentences)
+                {
+                    <div class="mb-2">
+                        @{
+                            var blanks = sentence.Blanks.ToList(); // ICollection → List
+                            int blankIndex = 0;
+
+                            string textWithInputs = System.Text.RegularExpressions.Regex.Replace(
+                            sentence.Text,
+                            "___",
+                            match =>
+                            {
+                                if (blankIndex < blanks.Count)
+                                {
+                                    var blank = blanks[blankIndex++];
+                                    return $"<input type='text' name='Blank_{blank.Id}' class='form-control d-inline w-auto mx-1' placeholder='Cevap' />";
+                                }
+                                return "___"; // eğer fazla boşluk varsa geri döndür
+                            }
+                            );
+                        }
+                        @Html.Raw(textWithInputs)
+                    </div>
+                }
+
+
+            </div>
+        </div>
+    }
+</div>

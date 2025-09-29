@@ -55,5 +55,14 @@ namespace IELTSExamPlatform.MVC.Areas.Admin.Controllers
 
             return RedirectToAction("QuestionsIndex");
         }
+
+
+        public async Task<IActionResult> ByPassage()
+        {
+            Guid xaqan = Guid.Parse("019992d6-db65-708a-a52a-a028c8df014e");
+            var data = await _readingService.GetQuestionsAsync(xaqan);
+
+            return View(data);
+        }
     }
 }
