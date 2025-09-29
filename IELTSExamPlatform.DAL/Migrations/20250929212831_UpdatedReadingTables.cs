@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace IELTSExamPlatform.DAL.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialMigration : Migration
+    public partial class UpdatedReadingTables : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -197,71 +197,6 @@ namespace IELTSExamPlatform.DAL.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "BooleanQuestions",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Content = table.Column<string>(type: "text", nullable: false),
-                    CorrectAnswer = table.Column<int>(type: "integer", nullable: false),
-                    ReadingPassageId = table.Column<Guid>(type: "uuid", nullable: false),
-                    QuestionText = table.Column<string>(type: "text", nullable: false),
-                    Order = table.Column<int>(type: "integer", nullable: false),
-                    QuestionRange = table.Column<string>(type: "text", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_BooleanQuestions", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_BooleanQuestions_ReadingPassages_ReadingPassageId",
-                        column: x => x.ReadingPassageId,
-                        principalTable: "ReadingPassages",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "ChoicesQuestions",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    ReadingPassageId = table.Column<Guid>(type: "uuid", nullable: false),
-                    QuestionText = table.Column<string>(type: "text", nullable: false),
-                    Order = table.Column<int>(type: "integer", nullable: false),
-                    QuestionRange = table.Column<string>(type: "text", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ChoicesQuestions", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_ChoicesQuestions_ReadingPassages_ReadingPassageId",
-                        column: x => x.ReadingPassageId,
-                        principalTable: "ReadingPassages",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "FillInTheBlanks",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    ReadingPassageId = table.Column<Guid>(type: "uuid", nullable: false),
-                    QuestionText = table.Column<string>(type: "text", nullable: false),
-                    Order = table.Column<int>(type: "integer", nullable: false),
-                    QuestionRange = table.Column<string>(type: "text", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_FillInTheBlanks", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_FillInTheBlanks_ReadingPassages_ReadingPassageId",
-                        column: x => x.ReadingPassageId,
-                        principalTable: "ReadingPassages",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Headings",
                 columns: table => new
                 {
@@ -308,6 +243,40 @@ namespace IELTSExamPlatform.DAL.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "ReadingQuestions",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    ReadingPassageId = table.Column<Guid>(type: "uuid", nullable: false),
+                    QuestionText = table.Column<string>(type: "text", nullable: false),
+                    Order = table.Column<int>(type: "integer", nullable: false),
+                    QuestionType = table.Column<string>(type: "character varying(21)", maxLength: 21, nullable: false),
+                    Content = table.Column<string>(type: "text", nullable: true),
+                    CorrectAnswer = table.Column<int>(type: "integer", nullable: true),
+                    Text = table.Column<string>(type: "text", nullable: true),
+                    HeadingId = table.Column<Guid>(type: "uuid", nullable: true),
+                    CreatedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UpdatedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ReadingQuestions", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ReadingQuestions_Headings_HeadingId",
+                        column: x => x.HeadingId,
+                        principalTable: "Headings",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ReadingQuestions_ReadingPassages_ReadingPassageId",
+                        column: x => x.ReadingPassageId,
+                        principalTable: "ReadingPassages",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "QuestionOptions",
                 columns: table => new
                 {
@@ -324,9 +293,9 @@ namespace IELTSExamPlatform.DAL.Migrations
                 {
                     table.PrimaryKey("PK_QuestionOptions", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_QuestionOptions_ChoicesQuestions_ChoiceQuestionId",
+                        name: "FK_QuestionOptions_ReadingQuestions_ChoiceQuestionId",
                         column: x => x.ChoiceQuestionId,
-                        principalTable: "ChoicesQuestions",
+                        principalTable: "ReadingQuestions",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -337,7 +306,9 @@ namespace IELTSExamPlatform.DAL.Migrations
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     FillInTheBlankId = table.Column<Guid>(type: "uuid", nullable: false),
+                    FillInTheBlankId1 = table.Column<Guid>(type: "uuid", nullable: false),
                     Text = table.Column<string>(type: "text", nullable: false),
+                    Order = table.Column<int>(type: "integer", nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdatedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
@@ -346,38 +317,15 @@ namespace IELTSExamPlatform.DAL.Migrations
                 {
                     table.PrimaryKey("PK_Sentences", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Sentences_FillInTheBlanks_FillInTheBlankId",
+                        name: "FK_Sentences_ReadingQuestions_FillInTheBlankId",
                         column: x => x.FillInTheBlankId,
-                        principalTable: "FillInTheBlanks",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "MatchHeadingsQuestions",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Text = table.Column<string>(type: "text", nullable: false),
-                    HeadingId = table.Column<Guid>(type: "uuid", nullable: false),
-                    ReadingPassageId = table.Column<Guid>(type: "uuid", nullable: false),
-                    QuestionText = table.Column<string>(type: "text", nullable: false),
-                    Order = table.Column<int>(type: "integer", nullable: false),
-                    QuestionRange = table.Column<string>(type: "text", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_MatchHeadingsQuestions", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_MatchHeadingsQuestions_Headings_HeadingId",
-                        column: x => x.HeadingId,
-                        principalTable: "Headings",
+                        principalTable: "ReadingQuestions",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_MatchHeadingsQuestions_ReadingPassages_ReadingPassageId",
-                        column: x => x.ReadingPassageId,
-                        principalTable: "ReadingPassages",
+                        name: "FK_Sentences_ReadingQuestions_FillInTheBlankId1",
+                        column: x => x.FillInTheBlankId1,
+                        principalTable: "ReadingQuestions",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -448,33 +396,8 @@ namespace IELTSExamPlatform.DAL.Migrations
                 column: "SentenceId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_BooleanQuestions_ReadingPassageId",
-                table: "BooleanQuestions",
-                column: "ReadingPassageId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ChoicesQuestions_ReadingPassageId",
-                table: "ChoicesQuestions",
-                column: "ReadingPassageId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_FillInTheBlanks_ReadingPassageId",
-                table: "FillInTheBlanks",
-                column: "ReadingPassageId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Headings_ReadingPassageId",
                 table: "Headings",
-                column: "ReadingPassageId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_MatchHeadingsQuestions_HeadingId",
-                table: "MatchHeadingsQuestions",
-                column: "HeadingId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_MatchHeadingsQuestions_ReadingPassageId",
-                table: "MatchHeadingsQuestions",
                 column: "ReadingPassageId");
 
             migrationBuilder.CreateIndex(
@@ -493,9 +416,24 @@ namespace IELTSExamPlatform.DAL.Migrations
                 column: "ReadingId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_ReadingQuestions_HeadingId",
+                table: "ReadingQuestions",
+                column: "HeadingId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ReadingQuestions_ReadingPassageId",
+                table: "ReadingQuestions",
+                column: "ReadingPassageId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Sentences_FillInTheBlankId",
                 table: "Sentences",
                 column: "FillInTheBlankId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Sentences_FillInTheBlankId1",
+                table: "Sentences",
+                column: "FillInTheBlankId1");
         }
 
         /// <inheritdoc />
@@ -520,12 +458,6 @@ namespace IELTSExamPlatform.DAL.Migrations
                 name: "Blanks");
 
             migrationBuilder.DropTable(
-                name: "BooleanQuestions");
-
-            migrationBuilder.DropTable(
-                name: "MatchHeadingsQuestions");
-
-            migrationBuilder.DropTable(
                 name: "QuestionOptions");
 
             migrationBuilder.DropTable(
@@ -541,13 +473,10 @@ namespace IELTSExamPlatform.DAL.Migrations
                 name: "Sentences");
 
             migrationBuilder.DropTable(
+                name: "ReadingQuestions");
+
+            migrationBuilder.DropTable(
                 name: "Headings");
-
-            migrationBuilder.DropTable(
-                name: "ChoicesQuestions");
-
-            migrationBuilder.DropTable(
-                name: "FillInTheBlanks");
 
             migrationBuilder.DropTable(
                 name: "ReadingPassages");

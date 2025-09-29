@@ -1,9 +1,8 @@
 ﻿namespace IELTSExamPlatform.CORE.Entities.Common;
-public class ReadingQuestion
+public class ReadingQuestion : BaseEntity
 {
-    public Guid Id { get; set; } 
     public Guid ReadingPassageId { get; set; }
     public string QuestionText { get; set; } 
     public int Order { get; set; }
-    public string? QuestionRange { get; set; }
+    public string QuestionType { get; set; }    
 }

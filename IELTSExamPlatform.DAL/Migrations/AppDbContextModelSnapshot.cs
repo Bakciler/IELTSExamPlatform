@@ -110,6 +110,9 @@ namespace IELTSExamPlatform.DAL.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
+                    b.Property<int>("Order")
+                        .HasColumnType("integer");
+
                     b.Property<Guid>("SentenceId")
                         .HasColumnType("uuid");
 
@@ -123,89 +126,43 @@ namespace IELTSExamPlatform.DAL.Migrations
                     b.ToTable("Blanks");
                 });
 
-            modelBuilder.Entity("IELTSExamPlatform.CORE.Entities.BooleanQuestion", b =>
+            modelBuilder.Entity("IELTSExamPlatform.CORE.Entities.Common.ReadingQuestion", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<string>("Content")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("timestamp with time zone");
 
-                    b.Property<int>("CorrectAnswer")
-                        .HasColumnType("integer");
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
 
                     b.Property<int>("Order")
                         .HasColumnType("integer");
-
-                    b.Property<string>("QuestionRange")
-                        .HasColumnType("text");
 
                     b.Property<string>("QuestionText")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<Guid>("ReadingPassageId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ReadingPassageId");
-
-                    b.ToTable("BooleanQuestions");
-                });
-
-            modelBuilder.Entity("IELTSExamPlatform.CORE.Entities.ChoiceQuestion", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<int>("Order")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("QuestionRange")
-                        .HasColumnType("text");
-
-                    b.Property<string>("QuestionText")
+                    b.Property<string>("QuestionType")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(21)
+                        .HasColumnType("character varying(21)");
 
                     b.Property<Guid>("ReadingPassageId")
                         .HasColumnType("uuid");
 
-                    b.HasKey("Id");
-
-                    b.HasIndex("ReadingPassageId");
-
-                    b.ToTable("ChoicesQuestions");
-                });
-
-            modelBuilder.Entity("IELTSExamPlatform.CORE.Entities.FillInTheBlank", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<int>("Order")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("QuestionRange")
-                        .HasColumnType("text");
-
-                    b.Property<string>("QuestionText")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<Guid>("ReadingPassageId")
-                        .HasColumnType("uuid");
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ReadingPassageId");
+                    b.ToTable("ReadingQuestions");
 
-                    b.ToTable("FillInTheBlanks");
+                    b.HasDiscriminator<string>("QuestionType").HasValue("ReadingQuestion");
+
+                    b.UseTphMappingStrategy();
                 });
 
             modelBuilder.Entity("IELTSExamPlatform.CORE.Entities.Heading", b =>
@@ -239,41 +196,6 @@ namespace IELTSExamPlatform.DAL.Migrations
                     b.HasIndex("ReadingPassageId");
 
                     b.ToTable("Headings");
-                });
-
-            modelBuilder.Entity("IELTSExamPlatform.CORE.Entities.MatchHeadingsQuestion", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("HeadingId")
-                        .HasColumnType("uuid");
-
-                    b.Property<int>("Order")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("QuestionRange")
-                        .HasColumnType("text");
-
-                    b.Property<string>("QuestionText")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<Guid>("ReadingPassageId")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("Text")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("HeadingId");
-
-                    b.HasIndex("ReadingPassageId");
-
-                    b.ToTable("MatchHeadingsQuestions");
                 });
 
             modelBuilder.Entity("IELTSExamPlatform.CORE.Entities.QuestionOption", b =>
@@ -408,8 +330,14 @@ namespace IELTSExamPlatform.DAL.Migrations
                     b.Property<Guid>("FillInTheBlankId")
                         .HasColumnType("uuid");
 
+                    b.Property<Guid>("FillInTheBlankId1")
+                        .HasColumnType("uuid");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
+
+                    b.Property<int>("Order")
+                        .HasColumnType("integer");
 
                     b.Property<string>("Text")
                         .IsRequired()
@@ -421,6 +349,8 @@ namespace IELTSExamPlatform.DAL.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("FillInTheBlankId");
+
+                    b.HasIndex("FillInTheBlankId1");
 
                     b.ToTable("Sentences");
                 });
@@ -557,6 +487,58 @@ namespace IELTSExamPlatform.DAL.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("IELTSExamPlatform.CORE.Entities.BooleanQuestion", b =>
+                {
+                    b.HasBaseType("IELTSExamPlatform.CORE.Entities.Common.ReadingQuestion");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("CorrectAnswer")
+                        .HasColumnType("integer");
+
+                    b.HasIndex("ReadingPassageId");
+
+                    b.HasDiscriminator().HasValue("Boolean");
+                });
+
+            modelBuilder.Entity("IELTSExamPlatform.CORE.Entities.ChoiceQuestion", b =>
+                {
+                    b.HasBaseType("IELTSExamPlatform.CORE.Entities.Common.ReadingQuestion");
+
+                    b.HasIndex("ReadingPassageId");
+
+                    b.HasDiscriminator().HasValue("Choice");
+                });
+
+            modelBuilder.Entity("IELTSExamPlatform.CORE.Entities.FillInTheBlank", b =>
+                {
+                    b.HasBaseType("IELTSExamPlatform.CORE.Entities.Common.ReadingQuestion");
+
+                    b.HasIndex("ReadingPassageId");
+
+                    b.HasDiscriminator().HasValue("FillInTheBlank");
+                });
+
+            modelBuilder.Entity("IELTSExamPlatform.CORE.Entities.MatchHeadingsQuestion", b =>
+                {
+                    b.HasBaseType("IELTSExamPlatform.CORE.Entities.Common.ReadingQuestion");
+
+                    b.Property<Guid>("HeadingId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Text")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasIndex("HeadingId");
+
+                    b.HasIndex("ReadingPassageId");
+
+                    b.HasDiscriminator().HasValue("MatchHeading");
+                });
+
             modelBuilder.Entity("IELTSExamPlatform.CORE.Entities.Blank", b =>
                 {
                     b.HasOne("IELTSExamPlatform.CORE.Entities.Sentence", "Sentence")
@@ -568,33 +550,6 @@ namespace IELTSExamPlatform.DAL.Migrations
                     b.Navigation("Sentence");
                 });
 
-            modelBuilder.Entity("IELTSExamPlatform.CORE.Entities.BooleanQuestion", b =>
-                {
-                    b.HasOne("IELTSExamPlatform.CORE.Entities.ReadingPassage", null)
-                        .WithMany("BooleanQuestions")
-                        .HasForeignKey("ReadingPassageId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("IELTSExamPlatform.CORE.Entities.ChoiceQuestion", b =>
-                {
-                    b.HasOne("IELTSExamPlatform.CORE.Entities.ReadingPassage", null)
-                        .WithMany("ChoiceQuestions")
-                        .HasForeignKey("ReadingPassageId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("IELTSExamPlatform.CORE.Entities.FillInTheBlank", b =>
-                {
-                    b.HasOne("IELTSExamPlatform.CORE.Entities.ReadingPassage", null)
-                        .WithMany("FillInTheBlanks")
-                        .HasForeignKey("ReadingPassageId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("IELTSExamPlatform.CORE.Entities.Heading", b =>
                 {
                     b.HasOne("IELTSExamPlatform.CORE.Entities.ReadingPassage", "ReadingPassage")
@@ -604,23 +559,6 @@ namespace IELTSExamPlatform.DAL.Migrations
                         .IsRequired();
 
                     b.Navigation("ReadingPassage");
-                });
-
-            modelBuilder.Entity("IELTSExamPlatform.CORE.Entities.MatchHeadingsQuestion", b =>
-                {
-                    b.HasOne("IELTSExamPlatform.CORE.Entities.Heading", "Heading")
-                        .WithMany()
-                        .HasForeignKey("HeadingId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("IELTSExamPlatform.CORE.Entities.ReadingPassage", null)
-                        .WithMany("MatchHeadingsQuestions")
-                        .HasForeignKey("ReadingPassageId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Heading");
                 });
 
             modelBuilder.Entity("IELTSExamPlatform.CORE.Entities.QuestionOption", b =>
@@ -658,9 +596,15 @@ namespace IELTSExamPlatform.DAL.Migrations
 
             modelBuilder.Entity("IELTSExamPlatform.CORE.Entities.Sentence", b =>
                 {
+                    b.HasOne("IELTSExamPlatform.CORE.Entities.Common.ReadingQuestion", null)
+                        .WithMany()
+                        .HasForeignKey("FillInTheBlankId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("IELTSExamPlatform.CORE.Entities.FillInTheBlank", "FillInTheBlank")
                         .WithMany("Sentences")
-                        .HasForeignKey("FillInTheBlankId")
+                        .HasForeignKey("FillInTheBlankId1")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -718,14 +662,48 @@ namespace IELTSExamPlatform.DAL.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("IELTSExamPlatform.CORE.Entities.BooleanQuestion", b =>
+                {
+                    b.HasOne("IELTSExamPlatform.CORE.Entities.ReadingPassage", null)
+                        .WithMany("BooleanQuestions")
+                        .HasForeignKey("ReadingPassageId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("IELTSExamPlatform.CORE.Entities.ChoiceQuestion", b =>
                 {
-                    b.Navigation("QuestionOptions");
+                    b.HasOne("IELTSExamPlatform.CORE.Entities.ReadingPassage", null)
+                        .WithMany("ChoiceQuestions")
+                        .HasForeignKey("ReadingPassageId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("IELTSExamPlatform.CORE.Entities.FillInTheBlank", b =>
                 {
-                    b.Navigation("Sentences");
+                    b.HasOne("IELTSExamPlatform.CORE.Entities.ReadingPassage", null)
+                        .WithMany("FillInTheBlanks")
+                        .HasForeignKey("ReadingPassageId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("IELTSExamPlatform.CORE.Entities.MatchHeadingsQuestion", b =>
+                {
+                    b.HasOne("IELTSExamPlatform.CORE.Entities.Heading", "Heading")
+                        .WithMany()
+                        .HasForeignKey("HeadingId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("IELTSExamPlatform.CORE.Entities.ReadingPassage", null)
+                        .WithMany("MatchHeadingsQuestions")
+                        .HasForeignKey("ReadingPassageId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Heading");
                 });
 
             modelBuilder.Entity("IELTSExamPlatform.CORE.Entities.Reading", b =>
@@ -751,6 +729,16 @@ namespace IELTSExamPlatform.DAL.Migrations
             modelBuilder.Entity("IELTSExamPlatform.CORE.Entities.Sentence", b =>
                 {
                     b.Navigation("Blanks");
+                });
+
+            modelBuilder.Entity("IELTSExamPlatform.CORE.Entities.ChoiceQuestion", b =>
+                {
+                    b.Navigation("QuestionOptions");
+                });
+
+            modelBuilder.Entity("IELTSExamPlatform.CORE.Entities.FillInTheBlank", b =>
+                {
+                    b.Navigation("Sentences");
                 });
 #pragma warning restore 612, 618
         }

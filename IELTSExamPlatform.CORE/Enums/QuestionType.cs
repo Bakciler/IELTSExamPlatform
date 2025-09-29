@@ -1,6 +1,10 @@
 ﻿namespace IELTSExamPlatform.CORE.Enums
 {
-    public class QuestionType
+    public enum QuestionType
     {
+        Boolean,
+        Choice,
+        FillInTheBlank,
+        MatchHeading
     }
 }

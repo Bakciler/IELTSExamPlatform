@@ -5,25 +5,18 @@
 namespace IELTSExamPlatform.DAL.Migrations
 {
     /// <inheritdoc />
-    public partial class DeletedOrder : Migration
+    public partial class CreatedReadingTables : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropColumn(
-                name: "Order",
-                table: "Blanks");
+
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AddColumn<int>(
-                name: "Order",
-                table: "Blanks",
-                type: "integer",
-                nullable: false,
-                defaultValue: 0);
+
         }
     }
 }

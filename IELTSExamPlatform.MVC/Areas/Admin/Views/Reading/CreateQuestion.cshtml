@@ -1,0 +1,113 @@
+﻿@model IELTSExamPlatform.BL.DTOs.Question.CreateQuestionDto
+
+@{
+    ViewData["Title"] = "Yeni Sual Yarat";
+}
+
+<h2>Yeni Sual Yarat</h2>
+
+<form asp-action="CreateQuestion" method="post">
+    <div class="form-group">
+        <label asp-for="ReadingPassageId">Reading Passage ID</label>
+        <input asp-for="ReadingPassageId" class="form-control" />
+        <span asp-validation-for="ReadingPassageId" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="QuestionText">Sual Mətni</label>
+        <textarea asp-for="QuestionText" class="form-control"></textarea>
+        <span asp-validation-for="QuestionText" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="QuestionType">Sual Tipi</label>
+        <select asp-for="QuestionType" class="form-control" id="questionType">
+            <option value="">-- Seçin --</option>
+            <option value="Boolean">Boolean</option>
+            <option value="Choice">Choice</option>
+            <option value="FillInTheBlank">FillInTheBlank</option>
+            <option value="MatchHeading">MatchHeading</option>
+        </select>
+        <span asp-validation-for="QuestionType" class="text-danger"></span>
+    </div>
+
+    <!-- Boolean Content -->
+    <div class="form-group" id="booleanContentGroup" style="display:none;">
+        <label asp-for="BooleanContent">Boolean Məzmunu</label>
+        <input asp-for="BooleanContent" class="form-control" />
+    </div>
+
+    <!-- Heading ID -->
+    <div class="form-group" id="headingIdGroup" style="display:none;">
+        <label asp-for="HeadingId">Heading ID</label>
+        <input asp-for="HeadingId" class="form-control" />
+    </div>
+
+    <!-- Choice Options -->
+    <div id="choiceOptionsGroup" style="display:none;">
+        <h4>Variantlar</h4>
+        <div id="optionsContainer">
+            <!-- JS ilə dinamik variantlar əlavə olunacaq -->
+        </div>
+        <button type="button" class="btn btn-secondary" onclick="addOption()">+ Variant əlavə et</button>
+    </div>
+
+    <!-- FillInTheBlank Sentences -->
+    <div id="sentencesGroup" style="display:none;">
+        <h4>Cümlələr</h4>
+        <div id="sentencesContainer">
+            <!-- JS ilə dinamik cümlələr əlavə olunacaq -->
+        </div>
+        <button type="button" class="btn btn-secondary" onclick="addSentence()">+ Cümlə əlavə et</button>
+    </div>
+
+    <br />
+    <button type="submit" class="btn btn-primary">Yarat</button>
+</form>
+
+@section scripts {
+    <script>
+        const questionTypeSelect = document.getElementById("questionType");
+
+        questionTypeSelect.addEventListener("change", function () {
+            const type = this.value;
+
+            document.getElementById("booleanContentGroup").style.display = type === "Boolean" ? "block" : "none";
+            document.getElementById("headingIdGroup").style.display = type === "MatchHeading" ? "block" : "none";
+            document.getElementById("choiceOptionsGroup").style.display = type === "Choice" ? "block" : "none";
+            document.getElementById("sentencesGroup").style.display = type === "FillInTheBlank" ? "block" : "none";
+        });
+
+        function addOption() {
+            const container = document.getElementById("optionsContainer");
+            const index = container.children.length;
+
+            const html = `
+                <div class="form-group">
+                    <label>Code</label>
+                    <input name="Options[${index}].Code" class="form-control" />
+                    <label>Content</label>
+                    <input name="Options[${index}].Content" class="form-control" />
+                    <label>Is Correct</label>
+                    <input type="checkbox" name="Options[${index}].IsCorrect" />
+                </div>
+            `;
+            container.insertAdjacentHTML("beforeend", html);
+        }
+
+        function addSentence() {
+            const container = document.getElementById("sentencesContainer");
+            const index = container.children.length;
+
+            const html = `
+                <div class="form-group">
+                    <label>Cümlə</label>
+                    <input name="Sentences[${index}].Content" class="form-control" />
+                    <label>Boşluq Cavabı</label>
+                    <input name="Sentences[${index}].Blanks[0].CorrectAnswer" class="form-control" />
+                </div>
+            `;
+            container.insertAdjacentHTML("beforeend", html);
+        }
+    </script>
+}
