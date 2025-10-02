@@ -64,25 +64,123 @@ public class ReadingService : IReadingService
     public async Task<List<ReadingDto>> GetAllAsync()
     {
         var readings = await _appDbContext.Readings
-        .Include(r => r.ReadingPassages)
-        .ThenInclude(p => p.ReadingParagrahs)
-        .ToListAsync();
+            .Include(r => r.ReadingPassages)
+            .ThenInclude(p => p.ReadingParagrahs)
+            .ToListAsync();
 
         var readingDtos = readings.Select(r => new ReadingDto
         {
             Id = r.Id,
             ReadingPassages = r.ReadingPassages.Select(p => new ReadingPassageDto
             {
+                Id = p.Id,
                 Title = p.Title,
                 Description = p.Description,
-                ReadingParagrahs = p.ReadingParagrahs.Select(pg => new ReadingParagraphDto
-                {
-                    Key = pg.Key,
-                    Content = pg.Content
-                }).ToList()
+                ReadingParagrahs = p.ReadingParagrahs
+                    .OrderBy(pg => pg.Key)   
+                    .Select(pg => new ReadingParagraphDto
+                    {
+                        Id = pg.Id,
+                        Key = pg.Key,
+                        Content = pg.Content
+                    }).ToList()
             }).ToList()
         }).ToList();
 
         return readingDtos;
     }
+
+    public async Task<ReadingDto> GetByIdAsync(Guid readingId)
+    {
+        var reading = await _appDbContext.Readings
+            .Include(r => r.ReadingPassages)
+                .ThenInclude(p => p.ReadingParagrahs)
+            .FirstOrDefaultAsync(r => r.Id == readingId);
+
+        if (reading == null)
+            return null;
+
+        return new ReadingDto
+        {
+            Id = reading.Id,
+            ReadingPassages = reading.ReadingPassages.Select(p => new ReadingPassageDto
+            {
+                Id = p.Id,
+                Title = p.Title,
+                Description = p.Description,
+                ReadingParagrahs = p.ReadingParagrahs
+                    .OrderBy(pg => pg.Key)
+                    .Select(pg => new ReadingParagraphDto
+                    {
+                        Id = pg.Id,
+                        Key = pg.Key,
+                        Content = pg.Content
+                    }).ToList()
+            }).ToList()
+        };
+    }
+
+    public async Task UpdateReadingAsync(Guid readingId, ReadingDto updatedReading)
+    {
+        var reading = await _appDbContext.Readings
+            .Include(r => r.ReadingPassages)
+                .ThenInclude(p => p.ReadingParagrahs)
+            .FirstOrDefaultAsync(r => r.Id == readingId);
+
+        if (reading == null)
+            throw new Exception("Reading not found");
+
+        for (int i = 0; i < updatedReading.ReadingPassages.Count; i++)
+        {
+            var passageDto = updatedReading.ReadingPassages[i];
+            var passage = reading.ReadingPassages.ElementAtOrDefault(i);
+            if (passage != null)
+            {
+                passage.Title = passageDto.Title;
+                passage.Description = passageDto.Description;
+
+                for (int j = 0; j < passageDto.ReadingParagrahs.Count; j++)
+                {
+                    var paraDto = passageDto.ReadingParagrahs[j];
+                    var paragraph = passage.ReadingParagrahs.ElementAtOrDefault(j);
+                    if (paragraph != null)
+                    {
+                        paragraph.Key = paraDto.Key;
+                        paragraph.Content = paraDto.Content;
+                    }
+                }
+            }
+        }
+
+        _appDbContext.Readings.Update(reading);
+        await _appDbContext.SaveChangesAsync();
+    }
+    public async Task DeletePassageAsync(Guid passageId)
+    {
+        var passage = await _appDbContext.ReadingPassages
+            .Include(p => p.ReadingParagrahs)
+            .FirstOrDefaultAsync(p => p.Id == passageId);
+
+        if (passage == null)
+            throw new Exception("Passage not found");
+
+        _appDbContext.ReadingParagraphs.RemoveRange(passage.ReadingParagrahs);
+        _appDbContext.ReadingPassages.Remove(passage);
+
+        await _appDbContext.SaveChangesAsync();
+    }
+
+    public async Task DeleteParagraphAsync(Guid paragraphId)
+    {
+        var paragraph = await _appDbContext.ReadingParagraphs
+            .FirstOrDefaultAsync(p => p.Id == paragraphId);
+
+        if (paragraph == null)
+            throw new Exception("Paragraph not found");
+
+        _appDbContext.ReadingParagraphs.Remove(paragraph);
+        await _appDbContext.SaveChangesAsync();
+    }
+
+
 }

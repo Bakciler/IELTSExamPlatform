@@ -3,7 +3,7 @@
 namespace IELTSExamPlatform.CORE.Entities;
 public class ReadingParagraphs : BaseEntity
 {
-    public char Key { get; set; }
+    public char? Key { get; set; }
     public string Content { get; set; }
     public Guid ReadingPassageId { get; set; }
     public ReadingPassage ReadingPassage { get; set; }

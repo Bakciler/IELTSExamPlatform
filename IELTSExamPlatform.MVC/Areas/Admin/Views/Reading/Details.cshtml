@@ -1,0 +1,189 @@
+﻿@model IELTSExamPlatform.BL.DTOs.Reading.GET.ReadingDto
+
+<div class="container-fluid">
+    <h1 class="h3 mb-4 text-gray-800">Reading Details & Update</h1>
+
+    <div class="card shadow mb-4">
+        <div class="card-body">
+            <form id="readingUpdateForm">
+                @for (int i = 0; i < Model.ReadingPassages.Count; i++)
+                {
+                    var passage = Model.ReadingPassages[i];
+                    <div class="mb-4 border p-3 rounded bg-light passage-block" data-passage-id="@passage.Id">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h4>Passage @(i + 1)</h4>
+                            <button type="button" class="btn btn-sm btn-danger delete-passage-btn" data-passage-id="@passage.Id">
+                                <i class="fas fa-trash-alt"></i> Delete Passage
+                            </button>
+                        </div>
+
+                        <div class="mb-2">
+                            <label class="form-label">Title</label>
+                            <input type="text" class="form-control passage-title" value="@passage.Title" />
+                        </div>
+
+                        <div class="mb-2">
+                            <label class="form-label">Description</label>
+                            <textarea class="form-control passage-description" rows="2">@passage.Description</textarea>
+                        </div>
+
+                        <h5>Paragraphs</h5>
+                        @for (int j = 0; j < passage.ReadingParagrahs.Count; j++)
+                        {
+                            var paragraph = passage.ReadingParagrahs[j];
+                            <div class="mb-3 p-2 border rounded paragraph-block d-flex justify-content-between align-items-start" data-paragraph-id="@paragraph.Id">
+                                <div class="flex-grow-1">
+                                    @if (paragraph.Key.HasValue)
+                                    {
+                                        <label class="form-label">Key: @paragraph.Key.Value</label>
+                                    }
+                                    <textarea class="form-control paragraph-content" rows="3">@paragraph.Content</textarea>
+                                </div>
+                                <button type="button" class="btn btn-sm btn-danger ms-2 delete-paragraph-btn" data-paragraph-id="@paragraph.Id">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </div>
+                        }
+                    </div>
+                }
+
+                <button type="button" id="saveReadingBtn" class="btn btn-success mt-3">
+                    <i class="fas fa-save me-1"></i> Save Changes
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        // Save Changes
+        document.getElementById('saveReadingBtn').addEventListener('click', async (event) => {
+            event.preventDefault();
+            const updatedReading = { Id: '@Model.Id', ReadingPassages: [] };
+
+            document.querySelectorAll('.passage-block').forEach(passageDiv => {
+                const title = passageDiv.querySelector('.passage-title').value;
+                const description = passageDiv.querySelector('.passage-description').value;
+
+                const paragraphs = [];
+                passageDiv.querySelectorAll('.paragraph-block').forEach(paraDiv => {
+                    const content = paraDiv.querySelector('.paragraph-content').value;
+                    const keyLabel = paraDiv.querySelector('label')?.innerText.replace("Key: ", "") || null;
+                    paragraphs.push({ Key: keyLabel, Content: content });
+                });
+
+                updatedReading.ReadingPassages.push({ Title: title, Description: description, ReadingParagrahs: paragraphs });
+            });
+
+            try {
+                const response = await fetch(`/Admin/Reading/Update/${updatedReading.Id}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+                    },
+                    body: JSON.stringify(updatedReading)
+                });
+
+                const result = await response.json();
+                if(result.success){
+                    Swal.fire('Saved!', result.message, 'success');
+                } else {
+                    Swal.fire('Error', result.message, 'error');
+                }
+            } catch (error) {
+                console.error(error);
+                Swal.fire('Error', 'Unexpected error occurred.', 'error');
+            }
+        });
+            document.querySelectorAll('.delete-passage-btn').forEach(btn => {
+            btn.addEventListener('click', (event) => {
+                event.preventDefault();
+
+                const passageDiv = btn.closest('.passage-block');
+                const passageId = passageDiv?.dataset.passageId;
+
+                if (!passageId) {
+                    alert("Passage ID yoxdur!");
+                    return;
+                }
+
+                // Sadəcə alert ilə ID göstəririk
+                alert("Silmək istədiyiniz Passage ID: " + passageId);
+            });
+                    // Delete Paragraph - yalnız alert ilə ID göstərmək üçün
+            document.querySelectorAll('.delete-paragraph-btn').forEach(btn => {
+            btn.addEventListener('click', (event) => {
+                event.preventDefault();
+
+                const paraDiv = btn.closest('.paragraph-block');
+                const paragraphId = paraDiv?.dataset.paragraphId;
+
+                if (!paragraphId) {
+                    alert("Paragraph ID yoxdur!");
+                    return;
+                }
+
+                // Sadəcə alert ilə ID göstəririk
+                alert("Silmək istədiyiniz Paragraph ID: " + paragraphId);
+            });
+        });
+
+        });
+
+        // Delete Passage
+        // document.querySelectorAll('.delete-passage-btn').forEach(btn => {
+        //     btn.addEventListener('click', async (event) => {
+        //         event.preventDefault();
+        //         if(!confirm('Are you sure you want to delete this passage?')) return;
+
+        //         const passageDiv = btn.closest('.passage-block');
+        //         const passageId = passageDiv.dataset.passageId;
+
+        //         try {
+        //             const response = await fetch(`/Admin/Reading/DeletePassage/${passageId}`, { method: 'POST' });
+        //             const result = await response.json();
+        //             if(result.success){
+        //                 passageDiv.remove();
+        //                 Swal.fire('Deleted!', result.message, 'success');
+        //             } else {
+        //                 Swal.fire('Error', result.message, 'error');
+        //             }
+        //         } catch (err) {
+        //             console.error(err);
+        //             Swal.fire('Error', 'Unexpected error occurred.', 'error');
+        //         }
+        //     });
+        // });
+
+        // Delete Paragraph
+        // document.querySelectorAll('.delete-paragraph-btn').forEach(btn => {
+        //     btn.addEventListener('click', async (event) => {
+        //         event.preventDefault();
+        //         if(!confirm('Are you sure you want to delete this paragraph?')) return;
+
+        //         const paraDiv = btn.closest('.paragraph-block');
+        //         const paragraphId = paraDiv.dataset.paragraphId;
+
+        //         try {
+        //             const response = await fetch(`/Admin/Reading/DeleteParagraph/${paragraphId}`, { method: 'POST' });
+        //             const result = await response.json();
+        //             if(result.success){
+        //                 paraDiv.remove();
+        //                 Swal.fire('Deleted!', result.message, 'success');
+        //             } else {
+        //                 Swal.fire('Error', result.message, 'error');
+        //             }
+        //         } catch (err) {
+        //             console.error(err);
+        //             Swal.fire('Error', 'Unexpected error occurred.', 'error');
+        //         }
+        //     });
+        // });
+
+    </script>
+}

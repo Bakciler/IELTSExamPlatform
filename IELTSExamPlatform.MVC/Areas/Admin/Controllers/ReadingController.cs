@@ -1,4 +1,5 @@
 ﻿using IELTSExamPlatform.BL.DTOs.Reading;
+using IELTSExamPlatform.BL.DTOs.Reading.GET;
 using IELTSExamPlatform.BL.DTOs.ReadingQuestions.FillBlanks;
 using IELTSExamPlatform.BL.Services.Abstractions;
 using Microsoft.AspNetCore.Mvc;
@@ -56,5 +57,63 @@ namespace IELTSExamPlatform.MVC.Areas.Admin.Controllers
 
             return RedirectToAction("QuestionsIndex");
         }
+
+        // GET: Admin/Reading/Details/{id}
+        public async Task<IActionResult> Details(Guid id)
+        {
+            var reading = await _readingService.GetByIdAsync(id);
+            if (reading == null)
+                return NotFound();
+
+            return View(reading); // Details.cshtml səhifəsini göstərəcək
+        }
+
+        // POST: Admin/Reading/Update/{id}
+        [HttpPost]
+        public async Task<IActionResult> Update(Guid id, [FromBody] ReadingDto updatedReading)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            try
+            {
+                await _readingService.UpdateReadingAsync(id, updatedReading);
+                return Ok(new { success = true, message = "Reading updated successfully." });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { success = false, message = ex.Message });
+            }
+        }
+
+        
+        public async Task<IActionResult> DeletePassage(Guid passageId)
+        {
+            try
+            {
+                await _readingService.DeletePassageAsync(passageId);
+                return Ok(new { success = true, message = "Passage deleted successfully." });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { success = false, message = ex.Message });
+            }
+        }
+
+        
+        public async Task<IActionResult> DeleteParagraph(Guid paragraphId)
+        {
+            try
+            {
+                await _readingService.DeleteParagraphAsync(paragraphId);
+                return Ok(new { success = true, message = "Paragraph deleted successfully." });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { success = false, message = ex.Message });
+            }
+        }
+
+
     }
 }
