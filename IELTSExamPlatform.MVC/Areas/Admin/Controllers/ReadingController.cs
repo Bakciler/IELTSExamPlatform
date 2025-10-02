@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace IELTSExamPlatform.MVC.Areas.Admin.Controllers
 {
     [Area("Admin")]
+    [Route("Admin/[controller]/[action]")]
     public class ReadingController : Controller
     {
         private readonly IReadingService _readingService;
@@ -15,6 +16,8 @@ namespace IELTSExamPlatform.MVC.Areas.Admin.Controllers
         {
             _readingService = readingService;
         }
+
+        [HttpGet]
         public async Task<IActionResult> Index()
         {
             var readings = await _readingService.GetAllAsync();
@@ -59,6 +62,7 @@ namespace IELTSExamPlatform.MVC.Areas.Admin.Controllers
         }
 
         // GET: Admin/Reading/Details/{id}
+        [HttpGet]
         public async Task<IActionResult> Details(Guid id)
         {
             var reading = await _readingService.GetByIdAsync(id);
@@ -69,7 +73,7 @@ namespace IELTSExamPlatform.MVC.Areas.Admin.Controllers
         }
 
         // POST: Admin/Reading/Update/{id}
-        [HttpPost]
+        [HttpPost("{id:guid}")]
         public async Task<IActionResult> Update(Guid id, [FromBody] ReadingDto updatedReading)
         {
             if (!ModelState.IsValid)
@@ -86,7 +90,7 @@ namespace IELTSExamPlatform.MVC.Areas.Admin.Controllers
             }
         }
 
-        [HttpDelete]
+        [HttpDelete("{passageId:guid}")]
         public async Task<IActionResult> DeletePassage(Guid passageId)
         {
             try
@@ -100,7 +104,7 @@ namespace IELTSExamPlatform.MVC.Areas.Admin.Controllers
             }
         }
 
-        [HttpDelete]
+        [HttpDelete("{paragraphId:guid}")]
         public async Task<IActionResult> DeleteParagraph(Guid paragraphId)
         {
             try

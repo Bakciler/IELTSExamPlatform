@@ -5,6 +5,7 @@
 
     <div class="card shadow mb-4">
         <div class="card-body">
+            @Html.AntiForgeryToken() <!-- CSRF token eklendi -->
             <form id="readingUpdateForm">
                 @for (int i = 0; i < Model.ReadingPassages.Count; i++)
                 {
@@ -56,10 +57,12 @@
 </div>
 
 @section scripts {
-    <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
+        // CSRF token al
+        const getCsrfToken = () => document.querySelector('input[name="__RequestVerificationToken"]')?.value || '';
+
         // Save Changes
         document.getElementById('saveReadingBtn').addEventListener('click', async (event) => {
             event.preventDefault();
@@ -84,7 +87,7 @@
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+                        'RequestVerificationToken': getCsrfToken()
                     },
                     body: JSON.stringify(updatedReading)
                 });
@@ -100,12 +103,8 @@
                 Swal.fire('Error', 'Unexpected error occurred.', 'error');
             }
         });
-            
-        
 
-        
-
-        //Delete Passage
+        // Delete Passage
         document.querySelectorAll('.delete-passage-btn').forEach(btn => {
             btn.addEventListener('click', async (event) => {
                 event.preventDefault();
@@ -115,7 +114,12 @@
                 const passageId = passageDiv.dataset.passageId;
 
                 try {
-                    const response = await fetch(`/Admin/Reading/DeletePassage/${passageId}`, { method: 'DELETE' });
+                    const response = await fetch(`/Admin/Reading/DeletePassage/${passageId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'RequestVerificationToken': getCsrfToken()
+                        }
+                    });
                     const result = await response.json();
                     if(result.success){
                         passageDiv.remove();
@@ -130,7 +134,7 @@
             });
         });
 
-        //Delete Paragraph
+        // Delete Paragraph
         document.querySelectorAll('.delete-paragraph-btn').forEach(btn => {
             btn.addEventListener('click', async (event) => {
                 event.preventDefault();
@@ -140,7 +144,11 @@
                 const paragraphId = paraDiv.dataset.paragraphId;
 
                 try {
-                    const response = await fetch(`/Admin/Reading/DeleteParagraph/${paragraphId}`, { method: 'DELETE' });
+                    const response = await fetch(`/Admin/Reading/DeleteParagraph/${paragraphId}`, {
+                        method: 'DELETE',
+                        headers: {
+                        }
+                    });
                     const result = await response.json();
                     if(result.success){
                         paraDiv.remove();
@@ -154,6 +162,5 @@
                 }
             });
         });
-
     </script>
 }
