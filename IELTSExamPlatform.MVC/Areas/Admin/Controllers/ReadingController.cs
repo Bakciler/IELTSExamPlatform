@@ -86,7 +86,7 @@ namespace IELTSExamPlatform.MVC.Areas.Admin.Controllers
             }
         }
 
-        
+        [HttpDelete]
         public async Task<IActionResult> DeletePassage(Guid passageId)
         {
             try
@@ -100,7 +100,7 @@ namespace IELTSExamPlatform.MVC.Areas.Admin.Controllers
             }
         }
 
-        
+        [HttpDelete]
         public async Task<IActionResult> DeleteParagraph(Guid paragraphId)
         {
             try
