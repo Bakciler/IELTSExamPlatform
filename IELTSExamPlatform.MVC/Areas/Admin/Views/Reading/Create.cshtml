@@ -4,64 +4,201 @@
     ViewData["Title"] = "Create";
 }
 
-<div class="container mt-4">
-    <h2 class="mb-4">Create Reading</h2>
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-md-11 col-lg-10">
+            <div class="shadow-sm border rounded bg-white">
 
-    <form asp-action="Create" method="post">
-        <div id="passages-container">
-            <!-- Passage inputs buraya əlavə olunacaq -->
+                <!-- Header -->
+                <div class="border-bottom bg-white p-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">Create Reading</h5>
+                        <div class="d-flex gap-1">
+                            <button type="button" class="btn btn-outline-primary btn-sm" id="add-passage-btn" title="Add Passage">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary btn-sm btn-icon" id="remove-last-passage-btn" title="Remove Last">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Form start -->
+                <form asp-action="Create" method="post" class="m-0" id="create-form">
+                    <div class="p-4">
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                        <!-- Dinamik Passages buraya gelecek -->
+                        <div id="passages-container" class="accordion"></div>
+                    </div>
+
+                    <!-- Footer -->
+                    <div class="border-top bg-light p-4">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+                            <button type="submit" class="btn btn-primary px-4" id="save-btn">Save Reading</button>
+                        </div>
+                    </div>
+                </form>
+                <!-- Form end -->
+
+            </div>
         </div>
-
-        <button type="button" class="btn btn-secondary mb-3" onclick="addPassage()">+ Add Passage</button>
-        <br />
-        <button type="submit" class="btn btn-primary">Save Reading</button>
-    </form>
+    </div>
 </div>
 
-@section scripts {
+@section Scripts {
     <script>
         let passageIndex = 0;
 
+        document.getElementById('add-passage-btn')?.addEventListener('click', () => addPassage());
+        document.getElementById('remove-last-passage-btn')?.addEventListener('click', () => removeLastPassage());
+
         function addPassage() {
-            const container = document.getElementById("passages-container");
-            const passageDiv = document.createElement("div");
-            passageDiv.classList.add("card", "mb-3", "p-3");
-            passageDiv.innerHTML = `
-                <h5>Passage ${passageIndex + 1}</h5>
-                <div class="mb-3">
-                    <label class="form-label">Title</label>
-                    <input name="Passages[${passageIndex}].Title" class="form-control" required />
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Description</label>
-                    <textarea name="Passages[${passageIndex}].Description" class="form-control" rows="2"></textarea>
-                </div>
-                <div id="paragraphs-${passageIndex}">
-                </div>
-                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="addParagraph(${passageIndex})">+ Add Paragraph</button>
-            `;
-            container.appendChild(passageDiv);
+            const addBtn = document.getElementById('add-passage-btn');
+            const container = document.getElementById('passages-container');
+            if (container.children.length >= 3) {
+                addBtn?.setAttribute('disabled', 'disabled');
+                addBtn?.classList.add('disabled');
+                return;
+            }
+
+            const card = document.createElement('div');
+            card.classList.add('accordion-item', 'border', 'rounded', 'mb-3');
+            card.setAttribute('data-passage', passageIndex);
+
+            const headerId = `passage-header-${passageIndex}`;
+            const collapseId = `passage-collapse-${passageIndex}`;
+
+            card.innerHTML = `
+                <h2 class="accordion-header mb-0" id="${headerId}">
+                    <button class="accordion-button bg-light d-flex justify-content-between align-items-center"
+                            type="button" data-bs-toggle="collapse" data-bs-target="#${collapseId}"
+                            aria-expanded="true" aria-controls="${collapseId}">
+                        <span class="text-body">Passage</span>
+                        <span class="badge bg-secondary ms-2">#${passageIndex + 1}</span>
+                    </button>
+                </h2>
+                <div id="${collapseId}" class="accordion-collapse collapse show" aria-labelledby="${headerId}">
+                    <div class="accordion-body">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Title</label>
+                                <input name="Passages[${passageIndex}].Title" class="form-control" placeholder="Enter passage title" required />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Description</label>
+                                <textarea name="Passages[${passageIndex}].Description" class="form-control" rows="1" placeholder="Short description"></textarea>
+                            </div>
+                        </div>
+                        <hr class="my-3" />
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h6 class="text-muted mb-0">Paragraphs</h6>
+                            <div class="d-flex gap-1">
+                                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="addParagraph(${passageIndex})" title="Add Paragraph">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="removeLastParagraph(${passageIndex})" title="Remove Last">
+                                    <i class="fas fa-minus"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div id="paragraphs-${passageIndex}" class=""></div>
+                    </div>
+                </div>`;
+
+            container.appendChild(card);
             passageIndex++;
+
+            if (container.children.length >= 3 && addBtn) {
+                addBtn.setAttribute('disabled', 'disabled');
+                addBtn.classList.add('disabled');
+            }
+        }
+
+        function removeLastPassage() {
+            const container = document.getElementById('passages-container');
+            if (container.children.length === 0) return;
+            const last = container.lastElementChild;
+            last && container.removeChild(last);
+            passageIndex = Math.max(0, passageIndex - 1);
+            reindexPassages();
+
+            const addBtn = document.getElementById('add-passage-btn');
+            if (container.children.length < 3 && addBtn) {
+                addBtn.removeAttribute('disabled');
+                addBtn.classList.remove('disabled');
+            }
         }
 
         function addParagraph(passageIdx) {
             const container = document.getElementById(`paragraphs-${passageIdx}`);
-            const paragraphCount = container.children.length;
+            if (!container) return;
+            const paragraphCount = container.querySelectorAll('[data-paragraph]')?.length || 0;
 
-            const paragraphDiv = document.createElement("div");
-            paragraphDiv.classList.add("border", "p-2", "mb-2");
-            paragraphDiv.innerHTML = `
-                <h6>Paragraph ${paragraphCount + 1}</h6>
-                <div class="mb-2">
-                    <label class="form-label">Key</label>
-                    <input name="Passages[${passageIdx}].Paragraphs[${paragraphCount}].Key" class="form-control" maxlength="1" required />
-                </div>
-                <div class="mb-2">
-                    <label class="form-label">Content</label>
-                    <textarea name="Passages[${passageIdx}].Paragraphs[${paragraphCount}].Content" class="form-control" rows="2" required></textarea>
-                </div>
-            `;
-            container.appendChild(paragraphDiv);
+            const div = document.createElement('div');
+            div.classList.add('border', 'rounded', 'p-3', 'mb-2');
+            div.setAttribute('data-paragraph', paragraphCount);
+
+            div.innerHTML = `
+                <div class="row g-2">
+                    <div class="col-auto">
+                        <label class="form-label">Key <span class="text-muted">(optional)</span></label>
+                        <input name="Passages[${passageIdx}].Paragraphs[${paragraphCount}].Key" class="form-control" maxlength="1" placeholder="A" />
+                    </div>
+                    <div class="col">
+                        <label class="form-label">Content</label>
+                        <textarea name="Passages[${passageIdx}].Paragraphs[${paragraphCount}].Content" class="form-control" rows="2" placeholder="Paragraph text..." required></textarea>
+                    </div>
+                </div>`;
+            container.appendChild(div);
         }
+
+        function removeLastParagraph(passageIdx) {
+            const container = document.getElementById(`paragraphs-${passageIdx}`);
+            if (!container || container.children.length === 0) return;
+            const last = container.lastElementChild;
+            last && container.removeChild(last);
+            reindexParagraphs(passageIdx);
+        }
+
+        function reindexPassages() {
+            const container = document.getElementById('passages-container');
+            const items = Array.from(container.children);
+            passageIndex = items.length;
+
+            items.forEach((item, newIdx) => {
+                item.setAttribute('data-passage', newIdx);
+                item.querySelectorAll('input, textarea').forEach((el) => {
+                    if (!el.name) return;
+                    el.name = el.name.replace(/Passages\[\d+\]/g, `Passages[${newIdx}]`);
+                });
+                const paraContainer = item.querySelector('[id^="paragraphs-"]');
+                paraContainer && (paraContainer.id = `paragraphs-${newIdx}`);
+                reindexParagraphs(newIdx);
+            });
+        }
+
+        function reindexParagraphs(passageIdx) {
+            const container = document.getElementById(`paragraphs-${passageIdx}`);
+            if (!container) return;
+            const items = Array.from(container.children);
+            items.forEach((item, newIdx) => {
+                item.setAttribute('data-paragraph', newIdx);
+                item.querySelectorAll('input, textarea').forEach((el) => {
+                    if (!el.name) return;
+                    el.name = el.name.replace(/Passages\[\d+\]\.Paragraphs\[\d+\]\.(.*)/, `Passages[${passageIdx}].Paragraphs[${newIdx}].$1`);
+                });
+            });
+        }
+
+        const createForm = document.getElementById('create-form');
+        const saveBtn = document.getElementById('save-btn');
+        createForm?.addEventListener('submit', function () {
+            if (!saveBtn) return;
+            saveBtn.disabled = true;
+            saveBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Saving...';
+        });
     </script>
-    }
+}

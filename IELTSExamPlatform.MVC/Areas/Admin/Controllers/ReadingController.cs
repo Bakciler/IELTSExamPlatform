@@ -14,9 +14,10 @@ namespace IELTSExamPlatform.MVC.Areas.Admin.Controllers
         {
             _readingService = readingService;
         }
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            return View();
+            var readings = await _readingService.GetAllAsync();
+            return View(readings);
         }
 
         public IActionResult Create()
@@ -31,7 +32,7 @@ namespace IELTSExamPlatform.MVC.Areas.Admin.Controllers
 
             await _readingService.CreateAsyncReading(dto);
 
-            return RedirectToAction("Index");
+            return RedirectToAction("Index", new { created = 1 });
         }
 
         public IActionResult QuestionsIndex()

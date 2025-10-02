@@ -1,4 +1,5 @@
 ﻿using IELTSExamPlatform.BL.DTOs.Reading;
+using IELTSExamPlatform.BL.DTOs.Reading.GET;
 using IELTSExamPlatform.BL.DTOs.ReadingQuestions.FillBlanks;
 using IELTSExamPlatform.BL.Services.Abstractions;
 using IELTSExamPlatform.CORE.Entities;
@@ -58,5 +59,30 @@ public class ReadingService : IReadingService
         await _appDbContext.Readings.AddAsync(reading);
         
         await _appDbContext.SaveChangesAsync();
+    }
+
+    public async Task<List<ReadingDto>> GetAllAsync()
+    {
+        var readings = await _appDbContext.Readings
+        .Include(r => r.ReadingPassages)
+        .ThenInclude(p => p.ReadingParagrahs)
+        .ToListAsync();
+
+        var readingDtos = readings.Select(r => new ReadingDto
+        {
+            Id = r.Id,
+            ReadingPassages = r.ReadingPassages.Select(p => new ReadingPassageDto
+            {
+                Title = p.Title,
+                Description = p.Description,
+                ReadingParagrahs = p.ReadingParagrahs.Select(pg => new ReadingParagraphDto
+                {
+                    Key = pg.Key,
+                    Content = pg.Content
+                }).ToList()
+            }).ToList()
+        }).ToList();
+
+        return readingDtos;
     }
 }
