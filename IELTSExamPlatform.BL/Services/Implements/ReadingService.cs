@@ -43,6 +43,7 @@ public class ReadingService : IReadingService
     {
         Reading reading = new Reading
         {
+            Title = dto.Title,
             ReadingPassages = dto.Passages.Select(p => new ReadingPassage
             {
                 Title = p.Title,
@@ -69,6 +70,7 @@ public class ReadingService : IReadingService
         var readingDtos = readings.Select(r => new ReadingDto
         {
             Id = r.Id,
+            Title = r.Title,
             ReadingPassages = r.ReadingPassages.Select(p => new ReadingPassageDto
             {
                 Id = p.Id,
@@ -100,6 +102,7 @@ public class ReadingService : IReadingService
         return new ReadingDto
         {
             Id = reading.Id,
+            Title = reading.Title,
             ReadingPassages = reading.ReadingPassages.Select(p => new ReadingPassageDto
             {
                 Id = p.Id,
@@ -198,5 +201,62 @@ public class ReadingService : IReadingService
         await _appDbContext.SaveChangesAsync();
 
         return choiceQuestion;
+    }
+    public async Task<ReadingPassageDto> AddPassageAsync(Guid readingId,CreateReadingPassageDto dto)
+    {
+        var reading = await _appDbContext.Readings
+            .Include(r => r.ReadingPassages)
+            .FirstOrDefaultAsync(r => r.Id == readingId);
+
+        if (reading == null)
+            throw new Exception("Reading not found");
+
+        if (reading.ReadingPassages.Count >= 3)
+            throw new Exception("A reading can have maximum 3 passages.");
+
+
+        var newPassage = new ReadingPassage
+        {
+            Title = dto.Title,
+            Description = dto.Description,
+            ReadingParagrahs = new List<ReadingParagraphs>()
+        };
+
+        reading.ReadingPassages.Add(newPassage);
+        await _appDbContext.SaveChangesAsync();
+
+        return new ReadingPassageDto
+        {
+            Id = newPassage.Id,
+            Title = newPassage.Title,
+            Description = newPassage.Description,
+            ReadingParagrahs = new List<ReadingParagraphDto>()
+        };
+    }
+
+    public async Task<ReadingParagraphDto> AddParagraphAsync(Guid passageId,CreateReadingParagraphsDto dto)
+    {
+        var passage = await _appDbContext.ReadingPassages
+            .Include(p => p.ReadingParagrahs)
+            .FirstOrDefaultAsync(p => p.Id == passageId);
+
+        if (passage == null)
+            throw new Exception("Passage not found");
+
+        var newParagraph = new ReadingParagraphs
+        {
+            Key = dto.Key,
+            Content = dto.Content
+        };
+
+        passage.ReadingParagrahs.Add(newParagraph);
+        await _appDbContext.SaveChangesAsync();
+
+        return new ReadingParagraphDto
+        {
+            Id = newParagraph.Id,
+            Key = newParagraph.Key,
+            Content = newParagraph.Content
+        };
     }
 }

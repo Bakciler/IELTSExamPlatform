@@ -118,6 +118,40 @@ namespace IELTSExamPlatform.MVC.Areas.Admin.Controllers
             }
         }
 
+        [HttpPost("{readingId:guid}")]
+        public async Task<IActionResult> AddPassage(Guid readingId, [FromBody] CreateReadingPassageDto dto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            try
+            {
+                var newPassage = await _readingService.AddPassageAsync(readingId, dto);
+                return Ok(new { success = true, data = newPassage, message = "Passage added successfully." });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { success = false, message = ex.Message });
+            }
+        }
+
+        [HttpPost("{passageId:guid}")]
+        public async Task<IActionResult> AddParagraph(Guid passageId, [FromBody] CreateReadingParagraphsDto dto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            try
+            {
+                var newParagraph = await _readingService.AddParagraphAsync(passageId, dto);
+                return Ok(new { success = true, data = newParagraph, message = "Paragraph added successfully." });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { success = false, message = ex.Message });
+            }
+        }
+
 
     }
 }

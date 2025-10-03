@@ -16,7 +16,14 @@ public interface IReadingService
     Task<ReadingDto?> GetByIdAsync(Guid id);
 
     Task UpdateReadingAsync(Guid readingId, ReadingDto updatedReading);
+
     Task DeletePassageAsync(Guid passageId);
+
     Task DeleteParagraphAsync(Guid paragraphId);
+
     Task<ChoiceQuestion> ChoiceQuestionCreateAsync(ChoiceQuestionCreateDto dto);
+
+    Task<ReadingPassageDto> AddPassageAsync(Guid readingId, CreateReadingPassageDto dto);
+
+    Task<ReadingParagraphDto> AddParagraphAsync(Guid passageId,CreateReadingParagraphsDto dto);
 }
