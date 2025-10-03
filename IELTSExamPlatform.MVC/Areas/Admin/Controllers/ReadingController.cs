@@ -1,5 +1,6 @@
 ﻿using IELTSExamPlatform.BL.DTOs.Reading;
 using IELTSExamPlatform.BL.DTOs.Reading.GET;
+using IELTSExamPlatform.BL.DTOs.ReadingQuestions.ChoiceQuestions;
 using IELTSExamPlatform.BL.DTOs.ReadingQuestions.FillBlanks;
 using IELTSExamPlatform.BL.Services.Abstractions;
 using Microsoft.AspNetCore.Mvc;
@@ -119,5 +120,38 @@ namespace IELTSExamPlatform.MVC.Areas.Admin.Controllers
         }
 
 
+        public async Task<IActionResult> QuestionCreateIndex(Guid id)
+        {
+            //Guid id = Guid.Parse("0199a6c2-c00d-7b59-a23e-9b44c5fbb3a6");
+
+            var passages = await _readingService.GetAllPassagesAsyncByReadingId(id);
+
+            ViewBag.Passages = passages;
+
+            return View();
+        }
+
+
+        [HttpPost]
+        public async Task<IActionResult> CreateQuestion([FromBody] QuestionCreateRequestDto request)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            try
+            {
+                var questionId = await _readingService.CreateQuestionAsync(request);
+                return Ok(new
+                {
+                    success = true,
+                    message = "Question created successfully!",
+                    questionId = questionId
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { success = false, message = ex.Message });
+            }
+        }
     }
 }

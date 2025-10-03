@@ -1,0 +1,67 @@
+﻿@{
+    ViewData["Title"] = "QuestionCreateIndex";
+}
+
+<main id="question-creator" class="py-5" style="margin-top: 80px;">
+
+    <!-- Question Creation Section -->
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto text-center mb-5">
+                <h1 class="display-5 fw-bold text-dark">IELTS Question Creator</h1>
+                <p class="lead text-muted">Create different types of IELTS questions with adaptive input fields</p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-10 mx-auto">
+                <div class="card border-0 shadow-lg">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-plus-circle me-2"></i>
+                            Create New Question
+                        </h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Select Passage:</label>
+                            <select class="form-select" id="passageSelect" onchange="changePassage()">
+                                <option value="">Choose a passage...</option>
+                                @if (ViewBag.Passages != null)
+                                {
+                                    foreach (var passage in ViewBag.Passages)
+                                    {
+                                        <option value="@passage.Id">@passage.Title</option>
+                                    }
+                                }
+                            </select>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Select Question Type:</label>
+                            <select class="form-select" id="questionType" onchange="changeQuestionType()">
+                                <option value="choice-question">Choice Question Type</option>
+                                <option value="multiple-choice">Multiple Choice</option>
+                                <option value="fill-blanks">Fill in the Blanks</option>
+                                <option value="true-false">True/False</option>
+                                <option value="matching">Matching</option>
+                                <option value="short-answer">Short Answer</option>
+                                <option value="essay">Essay Writing</option>
+                                <option value="listening">Listening Comprehension</option>
+                            </select>
+                        </div>
+
+                        <div id="questionContainer">
+                            <!-- Dynamic content will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="~/admin/assets/readingQuestions/readingQuestion.js"></script>
+<!-- Custom JS -->

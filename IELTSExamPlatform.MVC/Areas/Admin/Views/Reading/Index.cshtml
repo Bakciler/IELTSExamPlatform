@@ -42,6 +42,10 @@
                                        class="btn btn-sm btn-secondary">
                                         <i class="fas fa-info-circle"></i> Details
                                     </a>
+                                    <a asp-area="Admin" asp-controller="Reading" asp-action="QuestionCreateIndex" asp-route-id="@reading.Id"
+                                       class="btn btn-sm btn-secondary">
+                                        <i class="fas fa-info-circle"></i> Add Question
+                                    </a>
                                     <button class="btn btn-sm btn-danger delete-reading-btn"
                                             data-reading-index="@i">
                                         <i class="fas fa-trash"></i> Delete

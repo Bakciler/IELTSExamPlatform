@@ -12,11 +12,11 @@ public interface IReadingService
     Task AddFillInTheBlankQuestion(CreateFillInTheBlankDto dto);
 
     Task<List<ReadingDto>> GetAllAsync();
-
+    Task<List<ReadingPassageDto>> GetAllPassagesAsyncByReadingId(Guid id);
     Task<ReadingDto?> GetByIdAsync(Guid id);
 
     Task UpdateReadingAsync(Guid readingId, ReadingDto updatedReading);
     Task DeletePassageAsync(Guid passageId);
     Task DeleteParagraphAsync(Guid paragraphId);
-    Task<ChoiceQuestion> ChoiceQuestionCreateAsync(ChoiceQuestionCreateDto dto);
+    Task<Guid> CreateQuestionAsync(QuestionCreateRequestDto request);
 }

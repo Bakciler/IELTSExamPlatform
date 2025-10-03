@@ -1,9 +1,11 @@
-﻿using IELTSExamPlatform.BL.DTOs.Reading;
+﻿using Azure.Core;
+using IELTSExamPlatform.BL.DTOs.Reading;
 using IELTSExamPlatform.BL.DTOs.Reading.GET;
 using IELTSExamPlatform.BL.DTOs.ReadingQuestions.ChoiceQuestions;
 using IELTSExamPlatform.BL.DTOs.ReadingQuestions.FillBlanks;
 using IELTSExamPlatform.BL.Services.Abstractions;
 using IELTSExamPlatform.CORE.Entities;
+using IELTSExamPlatform.CORE.Entities.Common;
 using IELTSExamPlatform.DAL.Context;
 using Microsoft.EntityFrameworkCore;
 
@@ -54,9 +56,9 @@ public class ReadingService : IReadingService
                 }).ToList()
             }).ToList()
         };
-        
+
         await _appDbContext.Readings.AddAsync(reading);
-        
+
         await _appDbContext.SaveChangesAsync();
     }
     public async Task<List<ReadingDto>> GetAllAsync()
@@ -75,7 +77,7 @@ public class ReadingService : IReadingService
                 Title = p.Title,
                 Description = p.Description,
                 ReadingParagrahs = p.ReadingParagrahs
-                    .OrderBy(pg => pg.Key)   
+                    .OrderBy(pg => pg.Key)
                     .Select(pg => new ReadingParagraphDto
                     {
                         Id = pg.Id,
@@ -176,27 +178,52 @@ public class ReadingService : IReadingService
         _appDbContext.ReadingParagraphs.Remove(paragraph);
         await _appDbContext.SaveChangesAsync();
     }
-
-    public async Task<ChoiceQuestion> ChoiceQuestionCreateAsync(ChoiceQuestionCreateDto dto)
+    public async Task<List<ReadingPassageDto>> GetAllPassagesAsyncByReadingId(Guid id)
     {
-        var choiceQuestion = new ChoiceQuestion
+        var reading = await _appDbContext.Readings.Where(x => x.Id == id).Include(x => x.ReadingPassages).FirstOrDefaultAsync();
+
+        var passages = reading!.ReadingPassages.Select(x => new ReadingPassageDto
         {
-            Id = Guid.NewGuid(),
-            ReadingPassageId = dto.ReadingPassageId,
-            QuestionText = dto.QuestionText,
-            Order = dto.Order,
-            QuestionOptions = dto.Options.Select(o => new QuestionOption
-            {
-                Id = Guid.NewGuid(),
-                Code = o.Code,
-                Content = o.Content,
-                IsCorrect = o.IsCorrect
-            }).ToList()
-        };
+            Id = x.Id,
+            Title = x.Title,
+            Description = x.Description
+        }).ToList();
 
-        await _appDbContext.ChoiceQuestions.AddAsync(choiceQuestion);
+        return passages;
+
+    }
+    public async Task<Guid> CreateQuestionAsync(QuestionCreateRequestDto request)
+    {
+        if (request == null)
+            throw new ArgumentNullException(nameof(request));
+
+        ReadingQuestion question;
+
+        switch (request.Type)
+        {
+            case "Choice":
+                question = new ChoiceQuestion
+                {
+                    Id = Guid.NewGuid(),
+                    ReadingPassageId = request.ReadingPassageId,
+                    QuestionText = request.QuestionText,
+                    Order = 1,
+                    QuestionOptions = request.Options.Select(o => new QuestionOption
+                    {
+                        Id = Guid.NewGuid(),
+                        Code = o.Code,
+                        Content = o.Content,
+                        IsCorrect = o.IsCorrect
+                    }).ToList()
+                };
+                _appDbContext.ChoiceQuestions.Add((ChoiceQuestion)question);
+                break;
+
+            default:
+                throw new ArgumentException("Invalid question type");
+
+        }
         await _appDbContext.SaveChangesAsync();
-
-        return choiceQuestion;
+        return question.Id;
     }
 }
