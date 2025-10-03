@@ -1,5 +1,6 @@
 ﻿using IELTSExamPlatform.BL.DTOs.Reading;
 using IELTSExamPlatform.BL.DTOs.Reading.GET;
+using IELTSExamPlatform.BL.DTOs.ReadingQuestions.ChoiceQuestions;
 using IELTSExamPlatform.BL.DTOs.ReadingQuestions.FillBlanks;
 using IELTSExamPlatform.BL.Services.Abstractions;
 using IELTSExamPlatform.CORE.Entities;
@@ -24,7 +25,6 @@ public class ReadingService : IReadingService
             ReadingPassageId = dto.ReadingPassageId,
             QuestionText = dto.QuestionText,
             Order = dto.Order,
-            QuestionRange = dto.QuestionRange,
             Sentences = dto.Sentences.Select(s => new Sentence
             {
                 Text = s.Content,
@@ -39,7 +39,6 @@ public class ReadingService : IReadingService
         await _appDbContext.FillInTheBlanks.AddAsync(fib);
         await _appDbContext.SaveChangesAsync();
     }
-
     public async Task CreateAsyncReading(CreateReadingDto dto)
     {
         Reading reading = new Reading
@@ -60,7 +59,6 @@ public class ReadingService : IReadingService
         
         await _appDbContext.SaveChangesAsync();
     }
-
     public async Task<List<ReadingDto>> GetAllAsync()
     {
         var readings = await _appDbContext.Readings
@@ -89,7 +87,6 @@ public class ReadingService : IReadingService
 
         return readingDtos;
     }
-
     public async Task<ReadingDto> GetByIdAsync(Guid readingId)
     {
         var reading = await _appDbContext.Readings
@@ -119,7 +116,6 @@ public class ReadingService : IReadingService
             }).ToList()
         };
     }
-
     public async Task UpdateReadingAsync(Guid readingId, ReadingDto updatedReading)
     {
         var reading = await _appDbContext.Readings
@@ -169,7 +165,6 @@ public class ReadingService : IReadingService
 
         await _appDbContext.SaveChangesAsync();
     }
-
     public async Task DeleteParagraphAsync(Guid paragraphId)
     {
         var paragraph = await _appDbContext.ReadingParagraphs
@@ -182,5 +177,26 @@ public class ReadingService : IReadingService
         await _appDbContext.SaveChangesAsync();
     }
 
+    public async Task<ChoiceQuestion> ChoiceQuestionCreateAsync(ChoiceQuestionCreateDto dto)
+    {
+        var choiceQuestion = new ChoiceQuestion
+        {
+            Id = Guid.NewGuid(),
+            ReadingPassageId = dto.ReadingPassageId,
+            QuestionText = dto.QuestionText,
+            Order = dto.Order,
+            QuestionOptions = dto.Options.Select(o => new QuestionOption
+            {
+                Id = Guid.NewGuid(),
+                Code = o.Code,
+                Content = o.Content,
+                IsCorrect = o.IsCorrect
+            }).ToList()
+        };
 
+        await _appDbContext.ChoiceQuestions.AddAsync(choiceQuestion);
+        await _appDbContext.SaveChangesAsync();
+
+        return choiceQuestion;
+    }
 }

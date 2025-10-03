@@ -1,5 +1,6 @@
 ﻿using IELTSExamPlatform.BL.DTOs.Reading;
 using IELTSExamPlatform.BL.DTOs.Reading.GET;
+using IELTSExamPlatform.BL.DTOs.ReadingQuestions.ChoiceQuestions;
 using IELTSExamPlatform.BL.DTOs.ReadingQuestions.FillBlanks;
 using IELTSExamPlatform.CORE.Entities;
 
@@ -17,4 +18,5 @@ public interface IReadingService
     Task UpdateReadingAsync(Guid readingId, ReadingDto updatedReading);
     Task DeletePassageAsync(Guid passageId);
     Task DeleteParagraphAsync(Guid paragraphId);
+    Task<ChoiceQuestion> ChoiceQuestionCreateAsync(ChoiceQuestionCreateDto dto);
 }

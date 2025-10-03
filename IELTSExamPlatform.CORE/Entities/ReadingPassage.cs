@@ -9,9 +9,5 @@ public class ReadingPassage : BaseEntity
     public Reading Reading { get; set; }
     public ICollection<ReadingParagraphs> ReadingParagrahs { get; set; }= new List<ReadingParagraphs>();
     public ICollection<Heading> Headings { get; set; } = new List<Heading>();
-    public ICollection<BooleanQuestion> BooleanQuestions { get; set; } = new List<BooleanQuestion>();
-    public ICollection<ChoiceQuestion> ChoiceQuestions { get; set; } = new List<ChoiceQuestion>();
-    public ICollection<FillInTheBlank> FillInTheBlanks { get; set; } = new List<FillInTheBlank>();
-    public ICollection<MatchHeadingsQuestion> MatchHeadingsQuestions { get; set; } = new List<MatchHeadingsQuestion>();
-
+    public ICollection<ReadingQuestion> Questions { get; set; }
 }

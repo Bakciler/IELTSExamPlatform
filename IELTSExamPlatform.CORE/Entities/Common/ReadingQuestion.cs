@@ -5,5 +5,4 @@ public class ReadingQuestion
     public Guid ReadingPassageId { get; set; }
     public string QuestionText { get; set; } 
     public int Order { get; set; }
-    public string? QuestionRange { get; set; }
 }
