@@ -17,6 +17,7 @@ namespace IELTSExamPlatform.BL
             //Services
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IReadingService, ReadingService>();
+            services.AddScoped<IReadingExamService, ReadingExamService>();
 
             //Validator
             services.AddFluentValidationAutoValidation();

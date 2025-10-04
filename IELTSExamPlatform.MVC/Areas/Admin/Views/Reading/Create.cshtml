@@ -55,118 +55,133 @@
 </div>
 
 @section scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-        let passageIndex = 0;
-
-        document.getElementById('add-passage-btn')?.addEventListener('click', () => addPassage());
-        document.getElementById('remove-last-passage-btn')?.addEventListener('click', () => removeLastPassage());
-
-        function addPassage() {
-            const addBtn = document.getElementById('add-passage-btn');
-            const container = document.getElementById('passages-container');
-            if (container.children.length >= 3) return;
-
-            const card = document.createElement('div');
-            card.classList.add('accordion-item', 'border', 'rounded', 'mb-3');
-            card.setAttribute('data-passage', passageIndex);
-
-            const headerId = `passage-header-${passageIndex}`;
-            const collapseId = `passage-collapse-${passageIndex}`;
-
-            card.innerHTML = `
-                <h2 class="accordion-header mb-0" id="${headerId}">
-                    <button class="accordion-button bg-light d-flex justify-content-between align-items-center"
-                            type="button" data-bs-toggle="collapse" data-bs-target="#${collapseId}"
-                            aria-expanded="true" aria-controls="${collapseId}">
-                        <span class="text-body">Passage</span>
-                        <span class="badge bg-secondary ms-2">#${passageIndex + 1}</span>
-                    </button>
-                </h2>
-                <div id="${collapseId}" class="accordion-collapse collapse show" aria-labelledby="${headerId}">
-                    <div class="accordion-body">
-                        <div class="row g-3 mb-3">
-                            <div class="col-md-6">
-                                <label class="form-label">Passage Title</label>
-                                <input name="Passages[${passageIndex}].Title" class="form-control" placeholder="Enter passage title" required />
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Description</label>
-                                <textarea name="Passages[${passageIndex}].Description" class="form-control" rows="1" placeholder="Short description"></textarea>
-                            </div>
-                        </div>
-                        <hr class="my-3" />
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <h6 class="text-muted mb-0">Paragraphs</h6>
-                            <div class="d-flex gap-1">
-                                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="addParagraph(${passageIndex})" title="Add Paragraph">
-                                    <i class="fas fa-plus"></i>
-                                </button>
-                                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="removeLastParagraph(${passageIndex})" title="Remove Last">
-                                    <i class="fas fa-minus"></i>
-                                </button>
-                            </div>
-                        </div>
-                        <div id="paragraphs-${passageIndex}"></div>
-                    </div>
-                </div>`;
-
-            container.appendChild(card);
-            passageIndex++;
-
-            if (container.children.length >= 3 && addBtn) {
-                addBtn.setAttribute('disabled', 'disabled');
-                addBtn.classList.add('disabled');
-            }
-        }
-
-        function removeLastPassage() {
-            const container = document.getElementById('passages-container');
-            if (container.children.length === 0) return;
-            container.removeChild(container.lastElementChild);
-            passageIndex = Math.max(0, passageIndex - 1);
+        document.addEventListener('DOMContentLoaded', function() {
+            let passageIndex = 0;
 
             const addBtn = document.getElementById('add-passage-btn');
-            if (container.children.length < 3 && addBtn) {
-                addBtn.removeAttribute('disabled');
-                addBtn.classList.remove('disabled');
+            const container = document.getElementById('passages-container');
+
+            addBtn?.addEventListener('click', () => addPassage());
+            document.getElementById('remove-last-passage-btn')?.addEventListener('click', () => removeLastPassage());
+
+            function addPassage() {
+                if (container.children.length >= 3) {
+                    // Swal burada artıq işləyəcək
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Limit reached',
+                        text: 'You can only create up to 3 passages for one reading.',
+                        toast: true,
+                        position: 'top-end',
+                        showConfirmButton: false,
+                        timer: 2500,
+                        timerProgressBar: true
+                    });
+                    return;
+                }
+
+                const card = document.createElement('div');
+                card.classList.add('accordion-item', 'border', 'rounded', 'mb-3');
+                card.setAttribute('data-passage', passageIndex);
+
+                const headerId = `passage-header-${passageIndex}`;
+                const collapseId = `passage-collapse-${passageIndex}`;
+
+                card.innerHTML = `
+                    <h2 class="accordion-header mb-0" id="${headerId}">
+                        <button class="accordion-button bg-light d-flex justify-content-between align-items-center"
+                                type="button" data-bs-toggle="collapse" data-bs-target="#${collapseId}"
+                                aria-expanded="true" aria-controls="${collapseId}">
+                            <span class="text-body">Passage</span>
+                            <span class="badge bg-secondary ms-2">#${passageIndex + 1}</span>
+                        </button>
+                    </h2>
+                    <div id="${collapseId}" class="accordion-collapse collapse show" aria-labelledby="${headerId}">
+                        <div class="accordion-body">
+                            <div class="row g-3 mb-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">Passage Title</label>
+                                    <input name="Passages[${passageIndex}].Title" class="form-control" placeholder="Enter passage title" required />
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Description</label>
+                                    <textarea name="Passages[${passageIndex}].Description" class="form-control" rows="1" placeholder="Short description"></textarea>
+                                </div>
+                            </div>
+                            <hr class="my-3" />
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h6 class="text-muted mb-0">Paragraphs</h6>
+                                <div class="d-flex gap-1">
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="addParagraph(${passageIndex})" title="Add Paragraph">
+                                        <i class="fas fa-plus"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="removeLastParagraph(${passageIndex})" title="Remove Last">
+                                        <i class="fas fa-minus"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div id="paragraphs-${passageIndex}"></div>
+                        </div>
+                    </div>`;
+
+                container.appendChild(card);
+                passageIndex++;
+
+                if (container.children.length >= 3 && addBtn) {
+                    addBtn.setAttribute('disabled', 'disabled');
+                    addBtn.classList.add('disabled');
+                }
             }
-        }
 
-        function addParagraph(passageIdx) {
-            const container = document.getElementById(`paragraphs-${passageIdx}`);
-            if (!container) return;
-            const paragraphCount = container.querySelectorAll('[data-paragraph]')?.length || 0;
+            function removeLastPassage() {
+                if (container.children.length === 0) return;
+                container.removeChild(container.lastElementChild);
+                passageIndex = Math.max(0, passageIndex - 1);
 
-            const div = document.createElement('div');
-            div.classList.add('border', 'rounded', 'p-3', 'mb-2');
-            div.setAttribute('data-paragraph', paragraphCount);
+                if (container.children.length < 3 && addBtn) {
+                    addBtn.removeAttribute('disabled');
+                    addBtn.classList.remove('disabled');
+                }
+            }
 
-            div.innerHTML = `
-                <div class="row g-2">
-                    <div class="col-auto">
-                        <label class="form-label">Key <span class="text-muted">(optional)</span></label>
-                        <input name="Passages[${passageIdx}].Paragraphs[${paragraphCount}].Key" class="form-control" maxlength="1" placeholder="A" />
-                    </div>
-                    <div class="col">
-                        <label class="form-label">Content</label>
-                        <textarea name="Passages[${passageIdx}].Paragraphs[${paragraphCount}].Content" class="form-control" rows="2" placeholder="Paragraph text..." required></textarea>
-                    </div>
-                </div>`;
-            container.appendChild(div);
-        }
+            window.addParagraph = function(passageIdx) {
+                const pContainer = document.getElementById(`paragraphs-${passageIdx}`);
+                if (!pContainer) return;
+                const paragraphCount = pContainer.querySelectorAll('[data-paragraph]')?.length || 0;
 
-        function removeLastParagraph(passageIdx) {
-            const container = document.getElementById(`paragraphs-${passageIdx}`);
-            if (!container || container.children.length === 0) return;
-            container.removeChild(container.lastElementChild);
-        }
+                const div = document.createElement('div');
+                div.classList.add('border', 'rounded', 'p-3', 'mb-2');
+                div.setAttribute('data-paragraph', paragraphCount);
 
-        const createForm = document.getElementById('create-form');
-        const saveBtn = document.getElementById('save-btn');
-        createForm?.addEventListener('submit', function () {
-            if (!saveBtn) return;
-            saveBtn.disabled = true;
-            saveBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Saving...';
+                div.innerHTML = `
+                    <div class="row g-2">
+                        <div class="col-auto">
+                            <label class="form-label">Key <span class="text-muted">(optional)</span></label>
+                            <input name="Passages[${passageIdx}].Paragraphs[${paragraphCount}].Key" class="form-control" maxlength="1" placeholder="A" />
+                        </div>
+                        <div class="col">
+                            <label class="form-label">Content</label>
+                            <textarea name="Passages[${passageIdx}].Paragraphs[${paragraphCount}].Content" class="form-control" rows="2" placeholder="Paragraph text..." required></textarea>
+                        </div>
+                    </div>`;
+                pContainer.appendChild(div);
+            }
+
+            window.removeLastParagraph = function(passageIdx) {
+                const pContainer = document.getElementById(`paragraphs-${passageIdx}`);
+                if (!pContainer || pContainer.children.length === 0) return;
+                pContainer.removeChild(pContainer.lastElementChild);
+            }
+
+            const createForm = document.getElementById('create-form');
+            const saveBtn = document.getElementById('save-btn');
+            createForm?.addEventListener('submit', function () {
+                if (!saveBtn) return;
+                saveBtn.disabled = true;
+                saveBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Saving...';
+            });
         });
     </script>
 }

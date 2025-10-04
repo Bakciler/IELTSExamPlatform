@@ -168,7 +168,24 @@
             });
         }
 
+        // ✅ Add Passage düyməsi – maksimum 3 passage
         addPassageBtn.addEventListener('click', () => {
+            const currentPassages = passagesContainer.querySelectorAll('.passage-block');
+
+            if (currentPassages.length >= 3) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Limit reached',
+                    text: 'You can only create up to 3 passages for one reading.',
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 2500,
+                    timerProgressBar: true
+                });
+                return;
+            }
+
             const newPassageHtml = `
                 <div class="mb-4 border p-3 rounded bg-light passage-block" data-existing="false">
                     <input type="hidden" value="00000000-0000-0000-0000-000000000000" />
@@ -183,12 +200,25 @@
                     <h5>Paragraphs</h5>
                     <div class="paragraphs-container"></div>
                     <button type="button" class="btn btn-outline-primary btn-sm add-paragraph-btn mt-2">Add Paragraph</button>
+                    <button type="button" class="btn btn-outline-danger btn-sm remove-passage-btn mt-2">Cancel</button>
                 </div>
             `;
             passagesContainer.insertAdjacentHTML('beforeend', newPassageHtml);
             attachParagraphEvents();
+            attachPassageCancelEvents(); // ✅ yeni əlavə
             updateIndexes();
         });
+
+        // Passage Cancel düyməsini attach et
+        function attachPassageCancelEvents() {
+            document.querySelectorAll('.remove-passage-btn').forEach(btn => {
+                btn.onclick = () => {
+                    const passageBlock = btn.closest('.passage-block');
+                    passageBlock.remove();
+                    updateIndexes();
+                };
+            });
+        }
 
         // İlk attach
         attachParagraphEvents();
@@ -243,16 +273,15 @@
             const result = await response.json();
 
             if (result.success) {
-                // ✅ Mesajı localStorage-da saxla
                 localStorage.setItem("successMessage", "Uğurla yadda saxlanıldı!");
-
-                // Index səhifəsinə keçid
                 window.location.href = result.redirectUrl;
             } else {
                 Swal.fire("Xəta!", result.message, "error");
             }
-        });        
+        });
     });
 </script>
+
+
 
 

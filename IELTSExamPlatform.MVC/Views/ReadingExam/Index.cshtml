@@ -1,0 +1,841 @@
+﻿@using IELTSExamPlatform.BL.DTOs.ReadingExam
+@model GetReadingExamDto
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IELTS Reading Exam</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --primary-light: #3b82f6;
+            --secondary: #10b981;
+            --dark: #0f172a;
+            --darker: #020617;
+            --light: #f8fafc;
+            --card-bg: #1e293b;
+            --border: #334155;
+            --text: #e2e8f0;
+            --text-secondary: #94a3b8;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --correct: #22c55e;
+            --incorrect: #ef4444;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--darker), var(--dark));
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        body.light-theme {
+            --dark: #f1f5f9;
+            --darker: #e2e8f0;
+            --card-bg: #ffffff;
+            --border: #cbd5e1;
+            --text: #1e293b;
+            --text-secondary: #475569;
+            background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
+        }
+
+        /* Header Styles */
+        header {
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(10px);
+            color: white;
+            padding: 12px 0;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.4);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .light-theme header {
+            background: rgba(255, 255, 255, 0.95);
+            border-bottom: 1px solid #cbd5e1;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 25px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 20px;
+            font-weight: bold;
+            color: white;
+        }
+
+        .logo i {
+            font-size: 28px;
+            color: var(--primary);
+        }
+
+        .light-theme .logo {
+            color: var(--dark);
+        }
+
+        .exam-info {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .timer {
+            background: rgba(239, 68, 68, 0.2);
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .timer i {
+            color: var(--danger);
+        }
+
+        .camera-feed-header {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 2px solid var(--primary);
+            box-shadow: 0 0 10px rgba(37, 99, 235, 0.5);
+        }
+
+        .camera-feed-header video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .theme-toggle {
+            background: rgba(37, 99, 235, 0.15);
+            border: none;
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: var(--primary);
+            font-size: 20px;
+        }
+
+        .theme-toggle:hover {
+            background: rgba(37, 99, 235, 0.25);
+        }
+
+        /* Main Content */
+        .main-content {
+            min-height: calc(100vh - 180px);
+            padding: 30px 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Exam Layout */
+        .exam-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        media (max-width: 992px) {
+            .exam-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Passage Section */
+        .passage-section {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(37, 99, 235, 0.2);
+            height: 600px;
+            overflow-y: auto;
+        }
+
+        .light-theme .passage-section {
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(203, 213, 225, 0.6);
+        }
+
+        .section-title {
+            font-size: 24px;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--primary);
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .passage-content {
+            line-height: 1.8;
+            font-size: 17px;
+        }
+
+        .passage-content p {
+            margin-bottom: 20px;
+        }
+
+        /* Questions Section */
+        .questions-section {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(37, 99, 235, 0.2);
+            height: 600px;
+            overflow-y: auto;
+        }
+
+        .light-theme .questions-section {
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(203, 213, 225, 0.6);
+        }
+
+        .question {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .question:last-child {
+            border-bottom: none;
+        }
+
+        .question-text {
+            font-weight: 600;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            border-radius: 8px;
+            background: rgba(30, 41, 59, 0.5);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .light-theme .option {
+            background: rgba(241, 245, 249, 0.5);
+        }
+
+        .option:hover {
+            background: rgba(37, 99, 235, 0.2);
+        }
+
+        .option input[type="radio"],
+        .option input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+        }
+
+        /* Navigation */
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 28px;
+            background: linear-gradient(135deg, var(--primary), #1d4ed8);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 7px 20px rgba(29, 78, 216, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .btn:disabled {
+            background: rgba(148, 163, 184, 0.5);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Footer */
+        footer {
+            background: rgba(15, 23, 42, 0.9);
+            color: var(--text-secondary);
+            padding: 25px;
+            text-align: center;
+            border-top: 1px solid var(--border);
+            font-size: 16px;
+            margin-top: 40px;
+        }
+
+        .light-theme footer {
+            background: rgba(255, 255, 255, 0.9);
+            color: #475569;
+            border-top: 1px solid #cbd5e1;
+        }
+
+        /* Section Tabs */
+        .section-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .section-tab {
+            padding: 12px 20px;
+            background: rgba(30, 41, 59, 0.7);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: var(--text);
+        }
+
+        .light-theme .section-tab {
+            background: rgba(241, 245, 249, 0.7);
+        }
+
+        .section-tab.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            display: none;
+        }
+
+        .modal {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 30px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .light-theme .modal {
+            background: white;
+        }
+
+        .modal-title {
+            font-size: 24px;
+            margin-bottom: 15px;
+            color: var(--primary);
+        }
+
+        .modal-text {
+            margin-bottom: 25px;
+            line-height: 1.6;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: flex-end;
+        }
+
+        /* Question Types */
+        .matching-headings, .matching-features, .matching-sentence-endings {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .matching-item {
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        .short-answer input {
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: rgba(30, 41, 59, 0.5);
+            color: var(--text);
+        }
+
+        .light-theme .short-answer input {
+            background: rgba(241, 245, 249, 0.7);
+            color: #1e293b;
+        }
+
+        /* Progress Indicator */
+        .progress-indicator {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px;
+            padding: 20px;
+            margin-top: 20px;
+            background: var(--card-bg);
+            border-radius: 16px;
+            border: 1px solid var(--border);
+        }
+
+        .progress-dot {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: bold;
+            background: rgba(148, 163, 184, 0.2);
+            border: 1px solid var(--border);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .progress-dot.answered {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary-light);
+        }
+
+        .progress-dot.current {
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.5);
+        }
+
+        .progress-dot:hover {
+            transform: scale(1.1);
+        }
+
+        /* Responsive Design */
+        media (max-width: 768px) {
+            .header-content {
+                flex-wrap: wrap;
+                gap: 15px;
+            }
+
+            .exam-info {
+                order: 3;
+                width: 100%;
+                justify-content: center;
+            }
+
+            .section-tabs {
+                flex-wrap: wrap;
+            }
+
+            .navigation {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .matching-headings, .matching-features, .matching-sentence-endings {
+                grid-template-columns: 1fr;
+            }
+
+            .progress-indicator {
+                gap: 5px;
+            }
+
+            .progress-dot {
+                width: 30px;
+                height: 30px;
+                font-size: 12px;
+            }
+        }
+
+        /* Highlight styles */
+        .highlight {
+            background-color: rgba(255, 255, 0, 0.3);
+            padding: 2px 1px;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        .highlight.yellow { background-color: rgba(255, 255, 0, 0.3); }
+        .highlight.green { background-color: rgba(0, 255, 0, 0.3); }
+        .highlight.blue { background-color: rgba(0, 0, 255, 0.3); }
+        .highlight.pink { background-color: rgba(255, 0, 255, 0.3); }
+
+        /* Note indicator */
+        .note-indicator {
+            position: relative;
+            display: inline-block;
+        }
+
+        .note-indicator::after {
+            content: "📝";
+            font-size: 12px;
+            margin-left: 2px;
+            vertical-align: super;
+        }
+
+        /* Context menu */
+        .context-menu {
+            position: absolute;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            min-width: 150px;
+            display: none;
+        }
+
+        .light-theme .context-menu {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+        }
+
+        .context-menu-item {
+            padding: 10px 15px;
+            cursor: pointer;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .light-theme .context-menu-item {
+            color: var(--text);
+        }
+
+        .context-menu-item:hover {
+            background-color: rgba(37, 99, 235, 0.1);
+        }
+
+        .color-options {
+            display: none;
+            position: absolute;
+            left: 100%;
+            top: 0;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            padding: 5px;
+            z-index: 1001;
+        }
+
+        .light-theme .color-options {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+        }
+
+        .color-option {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            margin: 5px;
+            cursor: pointer;
+            display: inline-block;
+        }
+
+        .color-option.yellow { background-color: rgba(255, 255, 0, 0.5); }
+        .color-option.green { background-color: rgba(0, 255, 0, 0.5); }
+        .color-option.blue { background-color: rgba(0, 0, 255, 0.5); }
+        .color-option.pink { background-color: rgba(255, 0, 255, 0.5); }
+
+        /* Note modal */
+        .note-modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.3);
+            z-index: 1002;
+            width: 350px;
+            max-width: 90%;
+        }
+
+        .light-theme .note-modal {
+            background: white;
+            border: 1px solid var(--border);
+        }
+
+        .note-modal textarea {
+            width: 100%;
+            height: 120px;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 8px;
+            background: rgba(30, 41, 59, 0.5);
+            color: var(--text);
+            border: 1px solid var(--border);
+            resize: vertical;
+        }
+
+        .light-theme .note-modal textarea {
+            background: rgba(241, 245, 249, 0.7);
+            color: #1e293b;
+        }
+
+        .note-modal-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        /* Note tooltip */
+        .note-tooltip {
+            position: absolute;
+            background: white;
+            border: 1px solid #ccc;
+            padding: 10px;
+            border-radius: 6px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            z-index: 1003;
+            max-width: 250px;
+            display: none;
+            color: #333;
+            font-size: 14px;
+        }
+
+        /* Question type specific styles */
+        .table-completion, .note-completion, .summary-completion, .diagram-completion {
+            margin: 15px 0;
+        }
+
+        .table-completion table, .table-completion td, .table-completion th {
+            border: 1px solid var(--border);
+            border-collapse: collapse;
+            padding: 8px;
+        }
+
+        .table-completion input, .note-completion input, .summary-completion input, .diagram-completion input {
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid var(--border);
+            background: rgba(30, 41, 59, 0.5);
+            color: var(--text);
+            margin: 5px 0;
+        }
+
+        .light-theme .table-completion input, 
+        .light-theme .note-completion input, 
+        .light-theme .summary-completion input, 
+        .light-theme .diagram-completion input {
+            background: rgba(241, 245, 249, 0.7);
+            color: #1e293b;
+        }
+
+        .flow-chart {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .flow-chart-step {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .flow-chart-arrow {
+            margin: 0 10px;
+            color: var(--primary);
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="header-content">
+            <div class="logo">
+                <i class="fas fa-globe-americas"></i>
+                <span>IELTS Exam Platform</span>
+            </div>
+            <div class="exam-info">
+                <div class="timer">
+                    <i class="fas fa-clock"></i>
+                    <span id="exam-timer">60:00</span>
+                </div>
+                <div class="camera-feed-header">
+                    <video id="header-camera" autoplay muted></video>
+                </div>
+                <button class="theme-toggle" id="theme-toggle">
+                    <i class="fas fa-moon"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="section-tabs">
+            @for (int i = 0; i < Model.readingPassageDtos.Count; i++)
+            {
+                <div class="section-tab @(i == 0 ? "active" : "")" data-section="@(i + 1)">
+                    Section @(i + 1)
+                </div>
+            }
+        </div>
+
+        <div class="exam-container">
+            @for (int i = 0; i < Model.readingPassageDtos.Count; i++)
+            {
+                var passage = Model.readingPassageDtos.ElementAt(i);
+                <div class="passage-section" data-section="@(i + 1)" style="display:@(i == 0 ? "block" : "none")">
+                    <h3 class="section-title">
+                        <i class="fas fa-book-open"></i>
+                        @passage.Title
+                    </h3>
+
+                    <div class="passage-content">
+                        @foreach (var paragraph in passage.ReadingParagrahs)
+                        {
+                            <p>
+                                @if (paragraph.Key !=default(char))
+                                {
+                                    <strong>@paragraph.Key</strong>
+                                }
+                                @paragraph.Content
+                            </p>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 IELTS Exam Platform. All rights reserved. Secure exam environment.</p>
+            <p>IELTS is a registered trademark of Cambridge University ESOL, British Council and IDP Education Australia.</p>
+        </div>
+    </footer>
+
+    <!-- Modal -->
+    <div class="modal-overlay" id="confirmation-modal">
+        <div class="modal">
+            <h3 class="modal-title">Finish Exam</h3>
+            <p class="modal-text">Are you sure you want to finish the exam? This action cannot be undone. Your answers will be reviewed and your result will be calculated.</p>
+            <div class="modal-buttons">
+                <button class="btn btn-secondary" id="modal-cancel">Cancel</button>
+                <button class="btn" id="modal-confirm">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Context Menu -->
+    <div class="context-menu" id="context-menu">
+        <div class="context-menu-item" id="highlight-option">
+            <i class="fas fa-highlighter"></i> Highlight
+            <div class="color-options" id="color-options">
+                <div class="color-option yellow" data-color="yellow"></div>
+                <div class="color-option green" data-color="green"></div>
+                <div class="color-option blue" data-color="blue"></div>
+                <div class="color-option pink" data-color="pink"></div>
+            </div>
+        </div>
+        <div class="context-menu-item" id="add-note-option">
+            <i class="fas fa-sticky-note"></i> Add Note
+        </div>
+    </div>
+
+    <!-- Note Modal -->
+    <div class="note-modal" id="note-modal">
+        <h3>Add Note</h3>
+        <textarea id="note-text" placeholder="Write your note here..."></textarea>
+        <div class="note-modal-buttons">
+            <button class="btn btn-secondary" id="note-cancel">Cancel</button>
+            <button class="btn" id="note-save">Save</button>
+        </div>
+    </div>
+
+    <!-- Note Tooltip -->
+    <div class="note-tooltip" id="note-tooltip"></div>
+    
+
+<script>
+    // --- Section Tab Click Handling ---
+    document.querySelectorAll('.section-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+            const sectionId = tab.getAttribute('data-section');
+
+            // Update tab active state
+            document.querySelectorAll('.section-tab').forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+
+            // Show corresponding passage
+            document.querySelectorAll('.passage-section').forEach(section => {
+                section.style.display = section.getAttribute('data-section') === sectionId ? 'block' : 'none';
+            });
+        });
+    });
+</script>
+
+</body>
+</html>
