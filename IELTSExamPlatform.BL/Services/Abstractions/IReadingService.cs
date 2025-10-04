@@ -15,7 +15,7 @@ public interface IReadingService
     Task<List<ReadingPassageDto>> GetAllPassagesAsyncByReadingId(Guid id);
     Task<ReadingDto?> GetByIdAsync(Guid id);
 
-    Task UpdateReadingAsync(Guid readingId, ReadingDto updatedReading);
+    Task UpdateReadingAsync(Guid readingId, CreateReadingDto updatedReading);
     Task DeletePassageAsync(Guid passageId);
     Task DeleteParagraphAsync(Guid paragraphId);
     Task<Guid> CreateQuestionAsync(QuestionCreateRequestDto request);

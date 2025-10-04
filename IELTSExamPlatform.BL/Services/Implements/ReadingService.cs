@@ -45,6 +45,7 @@ public class ReadingService : IReadingService
     {
         Reading reading = new Reading
         {
+            Title = dto.Title,
             ReadingPassages = dto.Passages.Select(p => new ReadingPassage
             {
                 Title = p.Title,
@@ -71,6 +72,7 @@ public class ReadingService : IReadingService
         var readingDtos = readings.Select(r => new ReadingDto
         {
             Id = r.Id,
+            Title = r.Title,
             ReadingPassages = r.ReadingPassages.Select(p => new ReadingPassageDto
             {
                 Id = p.Id,
@@ -102,6 +104,7 @@ public class ReadingService : IReadingService
         return new ReadingDto
         {
             Id = reading.Id,
+            Title = reading.Title,
             ReadingPassages = reading.ReadingPassages.Select(p => new ReadingPassageDto
             {
                 Id = p.Id,
@@ -118,7 +121,7 @@ public class ReadingService : IReadingService
             }).ToList()
         };
     }
-    public async Task UpdateReadingAsync(Guid readingId, ReadingDto updatedReading)
+    public async Task UpdateReadingAsync(Guid readingId, CreateReadingDto updatedReading)
     {
         var reading = await _appDbContext.Readings
             .Include(r => r.ReadingPassages)
@@ -128,31 +131,64 @@ public class ReadingService : IReadingService
         if (reading == null)
             throw new Exception("Reading not found");
 
-        for (int i = 0; i < updatedReading.ReadingPassages.Count; i++)
-        {
-            var passageDto = updatedReading.ReadingPassages[i];
-            var passage = reading.ReadingPassages.ElementAtOrDefault(i);
-            if (passage != null)
-            {
-                passage.Title = passageDto.Title;
-                passage.Description = passageDto.Description;
+        // 1️⃣ Reading başlığını update et
+        reading.Title = updatedReading.Title;
 
-                for (int j = 0; j < passageDto.ReadingParagrahs.Count; j++)
-                {
-                    var paraDto = passageDto.ReadingParagrahs[j];
-                    var paragraph = passage.ReadingParagrahs.ElementAtOrDefault(j);
-                    if (paragraph != null)
-                    {
-                        paragraph.Key = paraDto.Key;
-                        paragraph.Content = paraDto.Content;
-                    }
-                }
-            }
+        // 2️⃣ Mövcud passages və paragraphs silirik
+        var existingPassages = reading.ReadingPassages.ToList();
+        foreach (var passage in existingPassages)
+        {
+            _appDbContext.ReadingParagraphs.RemoveRange(passage.ReadingParagrahs);
+            _appDbContext.ReadingPassages.Remove(passage);
         }
 
-        _appDbContext.Readings.Update(reading);
+        // 3️⃣ JSON-dan gələn passage-ları yenidən əlavə et
+        foreach (var passageDto in updatedReading.Passages)
+        {
+            // Mövcud ID varsa onu saxla, yoxsa yeni GUID yarat
+            var passageId = (passageDto.Id == Guid.Empty || passageDto.Id == Guid.Parse("00000000-0000-0000-0000-000000000000"))
+                            ? Guid.NewGuid()
+                            : passageDto.Id.Value;
+
+            var newPassage = new ReadingPassage
+            {
+                Id = passageId,
+                Title = passageDto.Title,
+                Description = passageDto.Description,
+                ReadingId = reading.Id,
+                ReadingParagrahs = new List<ReadingParagraphs>()
+            };
+
+            if (passageDto.Paragraphs != null)
+            {
+                foreach (var pg in passageDto.Paragraphs)
+                {
+                    var paraId = (pg.Id == Guid.Empty || pg.Id == Guid.Parse("00000000-0000-0000-0000-000000000000"))
+                                 ? Guid.NewGuid()
+                                 : pg.Id.Value;
+
+                    newPassage.ReadingParagrahs.Add(new ReadingParagraphs
+                    {
+                        Id = paraId,
+                        Key = pg.Key,
+                        Content = pg.Content,
+                        ReadingPassageId = newPassage.Id
+                    });
+                }
+            }
+
+            _appDbContext.ReadingPassages.Add(newPassage);
+        }
+
         await _appDbContext.SaveChangesAsync();
     }
+
+
+
+
+
+
+
     public async Task DeletePassageAsync(Guid passageId)
     {
         var passage = await _appDbContext.ReadingPassages

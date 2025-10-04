@@ -32,7 +32,7 @@
                             var reading = Model[i];
                             <tr>
                                 <td>@reading.Id</td>
-                                <td>Reading 1</td>
+                                <td>@reading.Title</td>
                                 <td>
                                     <button class="btn btn-sm btn-info view-reading-btn"
                                             data-reading-index="@i">
@@ -176,4 +176,24 @@
             modal.hide();
         });
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const message = localStorage.getItem("successMessage");
+            if (message) {
+                Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'success',
+                    title: message,
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true
+                });
+                localStorage.removeItem("successMessage");
+            }
+        });
+    </script>
+
+
 }

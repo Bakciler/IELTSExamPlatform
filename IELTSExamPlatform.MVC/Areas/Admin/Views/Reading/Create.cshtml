@@ -1,4 +1,4 @@
-﻿@using IELTSExamPlatform.BL.DTOs.Reading
+﻿﻿@using IELTSExamPlatform.BL.DTOs.Reading
 @model CreateReadingDto
 @{
     ViewData["Title"] = "Create";
@@ -29,7 +29,13 @@
                     <div class="p-4">
                         <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
-                        <!-- Dinamik Passages buraya gelecek -->
+                        <!-- Reading Title -->
+                        <div class="mb-3">
+                            <label class="form-label">Reading Title</label>
+                            <input asp-for="Title" class="form-control" placeholder="Enter reading title" required />
+                        </div>
+
+                        <!-- Dinamik Passages -->
                         <div id="passages-container" class="accordion"></div>
                     </div>
 
@@ -48,7 +54,7 @@
     </div>
 </div>
 
-@section Scripts {
+@section scripts {
     <script>
         let passageIndex = 0;
 
@@ -58,11 +64,7 @@
         function addPassage() {
             const addBtn = document.getElementById('add-passage-btn');
             const container = document.getElementById('passages-container');
-            if (container.children.length >= 3) {
-                addBtn?.setAttribute('disabled', 'disabled');
-                addBtn?.classList.add('disabled');
-                return;
-            }
+            if (container.children.length >= 3) return;
 
             const card = document.createElement('div');
             card.classList.add('accordion-item', 'border', 'rounded', 'mb-3');
@@ -82,9 +84,9 @@
                 </h2>
                 <div id="${collapseId}" class="accordion-collapse collapse show" aria-labelledby="${headerId}">
                     <div class="accordion-body">
-                        <div class="row g-3">
+                        <div class="row g-3 mb-3">
                             <div class="col-md-6">
-                                <label class="form-label">Title</label>
+                                <label class="form-label">Passage Title</label>
                                 <input name="Passages[${passageIndex}].Title" class="form-control" placeholder="Enter passage title" required />
                             </div>
                             <div class="col-md-6">
@@ -104,7 +106,7 @@
                                 </button>
                             </div>
                         </div>
-                        <div id="paragraphs-${passageIndex}" class=""></div>
+                        <div id="paragraphs-${passageIndex}"></div>
                     </div>
                 </div>`;
 
@@ -120,10 +122,8 @@
         function removeLastPassage() {
             const container = document.getElementById('passages-container');
             if (container.children.length === 0) return;
-            const last = container.lastElementChild;
-            last && container.removeChild(last);
+            container.removeChild(container.lastElementChild);
             passageIndex = Math.max(0, passageIndex - 1);
-            reindexPassages();
 
             const addBtn = document.getElementById('add-passage-btn');
             if (container.children.length < 3 && addBtn) {
@@ -158,39 +158,7 @@
         function removeLastParagraph(passageIdx) {
             const container = document.getElementById(`paragraphs-${passageIdx}`);
             if (!container || container.children.length === 0) return;
-            const last = container.lastElementChild;
-            last && container.removeChild(last);
-            reindexParagraphs(passageIdx);
-        }
-
-        function reindexPassages() {
-            const container = document.getElementById('passages-container');
-            const items = Array.from(container.children);
-            passageIndex = items.length;
-
-            items.forEach((item, newIdx) => {
-                item.setAttribute('data-passage', newIdx);
-                item.querySelectorAll('input, textarea').forEach((el) => {
-                    if (!el.name) return;
-                    el.name = el.name.replace(/Passages\[\d+\]/g, `Passages[${newIdx}]`);
-                });
-                const paraContainer = item.querySelector('[id^="paragraphs-"]');
-                paraContainer && (paraContainer.id = `paragraphs-${newIdx}`);
-                reindexParagraphs(newIdx);
-            });
-        }
-
-        function reindexParagraphs(passageIdx) {
-            const container = document.getElementById(`paragraphs-${passageIdx}`);
-            if (!container) return;
-            const items = Array.from(container.children);
-            items.forEach((item, newIdx) => {
-                item.setAttribute('data-paragraph', newIdx);
-                item.querySelectorAll('input, textarea').forEach((el) => {
-                    if (!el.name) return;
-                    el.name = el.name.replace(/Passages\[\d+\]\.Paragraphs\[\d+\]\.(.*)/, `Passages[${passageIdx}].Paragraphs[${newIdx}].$1`);
-                });
-            });
+            container.removeChild(container.lastElementChild);
         }
 
         const createForm = document.getElementById('create-form');

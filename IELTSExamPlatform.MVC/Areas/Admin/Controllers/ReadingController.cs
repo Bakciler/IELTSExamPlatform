@@ -73,9 +73,8 @@ namespace IELTSExamPlatform.MVC.Areas.Admin.Controllers
             return View(reading); // Details.cshtml səhifəsini göstərəcək
         }
 
-        // POST: Admin/Reading/Update/{id}
         [HttpPost("{id:guid}")]
-        public async Task<IActionResult> Update(Guid id, [FromBody] ReadingDto updatedReading)
+        public async Task<IActionResult> Update(Guid id, [FromBody] CreateReadingDto updatedReading)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -83,13 +82,19 @@ namespace IELTSExamPlatform.MVC.Areas.Admin.Controllers
             try
             {
                 await _readingService.UpdateReadingAsync(id, updatedReading);
-                return Ok(new { success = true, message = "Reading updated successfully." });
+                TempData["SuccessMessage"] = "Reading məlumatları uğurla yadda saxlanıldı!";
+                return Json(new
+                {
+                    success = true,
+                    redirectUrl = Url.Action(nameof(Index), "Reading", new { area = "Admin" })
+                });
             }
             catch (Exception ex)
             {
                 return BadRequest(new { success = false, message = ex.Message });
             }
         }
+
 
         [HttpDelete("{passageId:guid}")]
         public async Task<IActionResult> DeletePassage(Guid passageId)
